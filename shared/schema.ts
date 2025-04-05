@@ -15,18 +15,40 @@ export const users = pgTable("users", {
 });
 
 // Campanhas de doação
+export const campaignManagers = pgTable("campaign_managers", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  email: text("email").notNull().unique(),
+  phone: text("phone").notNull(),
+  document: text("document").notNull(), // CPF
+  password: text("password").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const bankAccounts = pgTable("bank_accounts", {
+  id: serial("id").primaryKey(),
+  managerId: integer("manager_id").notNull(),
+  bankName: text("bank_name").notNull(),
+  bankCode: text("bank_code").notNull(),
+  agency: text("agency").notNull(),
+  account: text("account").notNull(),
+  document: text("document").notNull(),
+  pixKeys: json("pix_keys").notNull(),
+});
+
 export const campaigns = pgTable("campaigns", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
   description: text("description").notNull(),
   location: text("location").notNull(),
   endDate: text("end_date").notNull(),
-  createdBy: integer("created_by").notNull(),
+  managerId: integer("manager_id").notNull(),
   urgent: boolean("urgent").default(false),
   imageUrl: text("image_url"),
   createdAt: timestamp("created_at").defaultNow(),
   active: boolean("active").default(true),
   uniqueCode: text("unique_code").notNull().unique(),
+  bankAccountId: integer("bank_account_id").notNull(),
 });
 
 // Categorias de itens

@@ -8,12 +8,31 @@ import {
   financialDonations, type FinancialDonation, type InsertFinancialDonation
 } from "@shared/schema";
 
+// Added interfaces for campaign manager and bank account
+interface CampaignManager {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  // Add other relevant fields as needed
+}
+
+interface BankAccount {
+  id: number;
+  campaignManagerId: number;
+  bankName: string;
+  accountNumber: string;
+  agency: string;
+  // Add other relevant fields as needed (e.g., Pix key)
+}
+
+
 export interface IStorage {
   // Users
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
-  
+
   // Campaigns
   getCampaigns(): Promise<Campaign[]>;
   getCampaign(id: number): Promise<Campaign | undefined>;
@@ -21,34 +40,41 @@ export interface IStorage {
   createCampaign(campaign: InsertCampaign): Promise<Campaign>;
   updateCampaign(id: number, campaign: Partial<Campaign>): Promise<Campaign | undefined>;
   deleteCampaign(id: number): Promise<boolean>;
-  
+
   // Categories
   getCategories(): Promise<Category[]>;
   getCategory(id: number): Promise<Category | undefined>;
   createCategory(category: InsertCategory): Promise<Category>;
-  
+
   // Needed Items
   getNeededItems(campaignId: number): Promise<NeededItem[]>;
   getNeededItem(id: number): Promise<NeededItem | undefined>;
   createNeededItem(neededItem: InsertNeededItem): Promise<NeededItem>;
   updateNeededItem(id: number, neededItem: Partial<NeededItem>): Promise<NeededItem | undefined>;
   deleteNeededItem(id: number): Promise<boolean>;
-  
+
   // Donations
   getDonations(campaignId?: number): Promise<Donation[]>;
   getDonation(id: number): Promise<Donation | undefined>;
   createDonation(donation: InsertDonation): Promise<Donation>;
   updateDonationStatus(id: number, status: string): Promise<Donation | undefined>;
-  
+
   // Donation Items
   getDonationItems(donationId: number): Promise<DonationItem[]>;
   createDonationItem(donationItem: InsertDonationItem): Promise<DonationItem>;
-  
+
   // Financial Donations
   getFinancialDonations(campaignId?: number): Promise<FinancialDonation[]>;
   getFinancialDonation(id: number): Promise<FinancialDonation | undefined>;
   createFinancialDonation(donation: InsertFinancialDonation): Promise<FinancialDonation>;
   updateFinancialDonationStatus(id: number, status: string): Promise<FinancialDonation | undefined>;
+
+  // Campaign Manager
+  createCampaignManager(data: any): Promise<CampaignManager>;
+  getCampaignManagerByEmail(email: string): Promise<CampaignManager | undefined>;
+
+  // Bank Account
+  createBankAccount(data: any): Promise<BankAccount>;
 }
 
 export class MemStorage implements IStorage {
@@ -59,6 +85,8 @@ export class MemStorage implements IStorage {
   private donations: Map<number, Donation>;
   private donationItems: Map<number, DonationItem>;
   private financialDonations: Map<number, FinancialDonation>;
+  private campaignManagers: Map<number, CampaignManager>; // Added
+  private bankAccounts: Map<number, BankAccount>;       // Added
   private lastIds: { [key: string]: number };
 
   constructor() {
@@ -69,6 +97,8 @@ export class MemStorage implements IStorage {
     this.donations = new Map();
     this.donationItems = new Map();
     this.financialDonations = new Map();
+    this.campaignManagers = new Map(); // Added
+    this.bankAccounts = new Map();       // Added
     this.lastIds = {
       users: 0,
       campaigns: 0,
@@ -76,9 +106,11 @@ export class MemStorage implements IStorage {
       neededItems: 0,
       donations: 0,
       donationItems: 0,
-      financialDonations: 0
+      financialDonations: 0,
+      campaignManagers: 0, // Added
+      bankAccounts: 0       // Added
     };
-    
+
     // Inicializando com dados de exemplo
     this.initializeData();
   }
@@ -108,7 +140,7 @@ export class MemStorage implements IStorage {
       higiene: this.createCategory({ name: "Higiene", color: "#FF5722" }).id,
       calcados: this.createCategory({ name: "Calçados", color: "#3F51B5" }).id
     };
-    
+
     // Usuário admin
     this.createUser({
       username: "admin",
@@ -118,7 +150,7 @@ export class MemStorage implements IStorage {
       role: "admin",
       organization: "Sou Solidário"
     });
-    
+
     // Campanhas iniciais
     const enchentesRS = this.createCampaign({
       title: "Enchentes em Porto Alegre",
@@ -131,7 +163,7 @@ export class MemStorage implements IStorage {
       active: true,
       uniqueCode: "P12345"
     });
-    
+
     this.createCampaign({
       title: "Reconstrução em Petrópolis",
       description: "Apoio às famílias afetadas pelos deslizamentos em Petrópolis. Materiais de construção e itens básicos.",
@@ -143,7 +175,7 @@ export class MemStorage implements IStorage {
       active: true,
       uniqueCode: "R67890"
     });
-    
+
     this.createCampaign({
       title: "Campanha do Agasalho",
       description: "Arrecadação de roupas de inverno para população em situação de vulnerabilidade em São Paulo.",
@@ -155,7 +187,7 @@ export class MemStorage implements IStorage {
       active: true,
       uniqueCode: "C24680"
     });
-    
+
     // Itens necessários
     this.createNeededItem({
       campaignId: enchentesRS.id,
@@ -165,7 +197,7 @@ export class MemStorage implements IStorage {
       unit: "garrafas",
       priority: 1
     });
-    
+
     this.createNeededItem({
       campaignId: enchentesRS.id,
       name: "Alimentos não perecíveis",
@@ -174,7 +206,7 @@ export class MemStorage implements IStorage {
       unit: "kg",
       priority: 1
     });
-    
+
     this.createNeededItem({
       campaignId: enchentesRS.id,
       name: "Roupas de inverno",
@@ -183,7 +215,7 @@ export class MemStorage implements IStorage {
       unit: "peças",
       priority: 2
     });
-    
+
     this.createNeededItem({
       campaignId: enchentesRS.id,
       name: "Cobertores",
@@ -192,7 +224,7 @@ export class MemStorage implements IStorage {
       unit: "unidades",
       priority: 1
     });
-    
+
     this.createNeededItem({
       campaignId: enchentesRS.id,
       name: "Produtos de higiene",
@@ -240,10 +272,10 @@ export class MemStorage implements IStorage {
   async createCampaign(insertCampaign: InsertCampaign): Promise<Campaign> {
     const id = this.getNextId("campaigns");
     const timestamp = new Date();
-    
+
     // Se não foi fornecido um código único, gere um automaticamente
     const uniqueCode = insertCampaign.uniqueCode || this.generateUniqueCode();
-    
+
     const campaign: Campaign = { ...insertCampaign, id, createdAt: timestamp, uniqueCode };
     this.campaigns.set(id, campaign);
     return campaign;
@@ -252,7 +284,7 @@ export class MemStorage implements IStorage {
   async updateCampaign(id: number, campaignUpdate: Partial<Campaign>): Promise<Campaign | undefined> {
     const campaign = this.campaigns.get(id);
     if (!campaign) return undefined;
-    
+
     const updatedCampaign = { ...campaign, ...campaignUpdate };
     this.campaigns.set(id, updatedCampaign);
     return updatedCampaign;
@@ -298,7 +330,7 @@ export class MemStorage implements IStorage {
   async updateNeededItem(id: number, neededItemUpdate: Partial<NeededItem>): Promise<NeededItem | undefined> {
     const neededItem = this.neededItems.get(id);
     if (!neededItem) return undefined;
-    
+
     const updatedNeededItem = { ...neededItem, ...neededItemUpdate };
     this.neededItems.set(id, updatedNeededItem);
     return updatedNeededItem;
@@ -332,7 +364,7 @@ export class MemStorage implements IStorage {
   async updateDonationStatus(id: number, status: string): Promise<Donation | undefined> {
     const donation = this.donations.get(id);
     if (!donation) return undefined;
-    
+
     const updatedDonation = { ...donation, status };
     this.donations.set(id, updatedDonation);
     return updatedDonation;
@@ -375,10 +407,29 @@ export class MemStorage implements IStorage {
   async updateFinancialDonationStatus(id: number, status: string): Promise<FinancialDonation | undefined> {
     const donation = this.financialDonations.get(id);
     if (!donation) return undefined;
-    
+
     const updatedDonation = { ...donation, status };
     this.financialDonations.set(id, updatedDonation);
     return updatedDonation;
+  }
+
+  async createCampaignManager(data: any): Promise<CampaignManager> {
+    const id = this.getNextId("campaignManagers");
+    const manager = { ...data, id };
+    this.campaignManagers.set(id, manager);
+    return manager;
+  }
+
+  async getCampaignManagerByEmail(email: string): Promise<CampaignManager | undefined> {
+    return Array.from(this.campaignManagers.values())
+      .find(manager => manager.email === email);
+  }
+
+  async createBankAccount(data: any): Promise<BankAccount> {
+    const id = this.getNextId("bankAccounts");
+    const bankAccount = { ...data, id };
+    this.bankAccounts.set(id, bankAccount);
+    return bankAccount;
   }
 }
 

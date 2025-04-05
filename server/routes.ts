@@ -368,6 +368,92 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Rotas de Gerenciadores de Campanha
+  app.post("/api/campaign-managers/register", async (req: Request, res: Response) => {
+    try {
+      const { name, email, phone, document, password, bankAccount } = req.body;
+      
+      // Criar gerenciador
+      const manager = await storage.createCampaignManager({
+        name,
+        email,
+        phone,
+        document,
+        password // Em produção, deve-se usar hash da senha
+      });
+
+      // Criar conta bancária
+      const bankAccountData = await storage.createBankAccount({
+        managerId: manager.id,
+        ...bankAccount
+      });
+
+      return res.status(201).json({
+        manager: {
+          id: manager.id,
+          name: manager.name,
+          email: manager.email
+        },
+        bankAccount: bankAccountData
+      });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: "Erro ao criar conta" });
+    }
+  });
+
+  app.post("/api/campaign-managers/login", async (req: Request, res: Response) => {
+    try {
+      const { email, password } = req.body;
+      const manager = await storage.getCampaignManagerByEmail(email);
+
+      if (!manager || manager.password !== password) { // Em produção, comparar hash
+        return res.status(401).json({ message: "Credenciais inválidas" });
+      }
+
+      // @ts-ignore
+      req.session.manager = {
+        id: manager.id,
+        name: manager.name,
+        email: manager.email
+      };
+
+      return res.json({
+        id: manager.id,
+        name: manager.name,
+        email: manager.email
+      });
+    } catch (error) {
+      return res.status(500).json({ message: "Erro ao fazer login" });
+    }
+  });
+
+  // Middleware para verificar se é gerenciador de campanha
+  const requireManager = (req: Request, res: Response, next: Function) => {
+    // @ts-ignore
+    if (!req.session.manager) {
+      return res.status(401).json({ message: "Acesso não autorizado" });
+    }
+    next();
+  };
+
+  app.post("/api/campaigns", requireManager, async (req: Request, res: Response) => {
+    try {
+      // @ts-ignore
+      const managerId = req.session.manager.id;
+      const campaignData = {
+        ...req.body,
+        managerId,
+        uniqueCode: Math.random().toString(36).substring(2, 8).toUpperCase()
+      };
+
+      const campaign = await storage.createCampaign(campaignData);
+      return res.status(201).json(campaign);
+    } catch (error) {
+      return res.status(500).json({ message: "Erro ao criar campanha" });
+    }
+  });
+
   // Rotas de Doações Financeiras
   app.post("/api/financial-donations", async (req: Request, res: Response) => {
     try {
