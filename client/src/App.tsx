@@ -11,6 +11,7 @@ import Home from "@/pages/home";
 import CampaignsPage from "@/pages/campaigns";
 import DonationProcess from "@/pages/donation";
 import CampaignSelection from "@/pages/donation/campaign-selection";
+import CampaignItems from "@/pages/donation/campaign-items";
 import ItemSelection from "@/pages/donation/item-selection";
 import DonorInfo from "@/pages/donation/donor-info";
 import Schedule from "@/pages/donation/schedule";
@@ -23,7 +24,7 @@ import CampaignForm from "@/pages/admin/campaign-form";
 import NotFound from "@/pages/not-found";
 
 function App() {
-  const [location] = useLocation();
+  const [location, navigate] = useLocation();
   const isAdminRoute = location.startsWith("/admin");
 
   // Verificar se o usuário está autenticado
@@ -156,6 +157,23 @@ function App() {
           </Route>
           
           <Route path="/doar/:id">
+            {(params) => {
+              const id = parseInt(params.id);
+              if (isNaN(id)) {
+                return <NotFound />;
+              }
+              return (
+                <CampaignItems 
+                  campaignId={id} 
+                  onItemsSelect={(selectedItemIds) => 
+                    navigate(`/doar/items/${id}`) 
+                  }
+                />
+              );
+            }}
+          </Route>
+          
+          <Route path="/doar/items/:id">
             {(params) => {
               const id = parseInt(params.id);
               if (isNaN(id)) {
