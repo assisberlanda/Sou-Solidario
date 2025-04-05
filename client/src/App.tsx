@@ -10,6 +10,7 @@ import PageLayout from "@/components/PageLayout";
 // Páginas
 import Home from "@/pages/home";
 import CampaignsPage from "@/pages/campaigns";
+import CampaignDetails from "@/pages/campaign-details";
 import DonationProcess from "@/pages/donation";
 import CampaignSelection from "@/pages/donation/campaign-selection";
 import CampaignItems from "@/pages/donation/campaign-items";
@@ -76,6 +77,20 @@ function App() {
             <PageLayout>
               <CampaignsPage />
             </PageLayout>
+          </Route>
+          
+          <Route path="/campanha/:id">
+            {(params) => {
+              const id = parseInt(params.id);
+              if (isNaN(id)) {
+                return <NotFound />;
+              }
+              return (
+                <PageLayout>
+                  <CampaignDetails campaignId={id} />
+                </PageLayout>
+              );
+            }}
           </Route>
           
           {/* Fluxo de Doação */}

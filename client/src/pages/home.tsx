@@ -110,7 +110,7 @@ const HomePage = () => {
                   ))
                 ) : campaigns && campaigns.length > 0 ? (
                   campaigns.slice(0, 2).map((campaign) => (
-                    <Link key={campaign.id} href={`/doar/${campaign.id}`}>
+                    <Link key={campaign.id} href={`/campanha/${campaign.id}`}>
                       <a className="block bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition cursor-pointer p-4">
                         <div className="flex items-start">
                           <div className={`bg-${campaign.urgent ? 'red' : 'amber'}-100 text-${campaign.urgent ? 'red' : 'amber'}-600 p-3 rounded-lg mr-4`}>
@@ -226,42 +226,44 @@ const HomePage = () => {
                 ))
               ) : campaigns && campaigns.length > 0 ? (
                 campaigns.map((campaign) => (
-                  <Card key={campaign.id} className="overflow-hidden shadow-sm hover:shadow-md transition cursor-pointer">
-                    <div className="h-40 bg-gray-200 relative">
-                      {campaign.imageUrl && (
-                        <img
-                          src={campaign.imageUrl}
-                          alt={campaign.title}
-                          className="w-full h-full object-cover"
-                        />
-                      )}
-                      {campaign.urgent && (
-                        <div className="absolute top-0 left-0 m-3 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded">
-                          URGENTE
-                        </div>
-                      )}
-                    </div>
-                    <CardContent className="p-4">
-                      <h4 className="font-heading font-bold text-lg">{campaign.title}</h4>
-                      <p className="text-sm text-gray-600 mb-3 line-clamp-2">
-                        {campaign.description}
-                      </p>
-
-                      <div className="flex items-center text-xs text-gray-500 mb-3">
-                        <MapPin className="h-3 w-3 mr-1" />
-                        <span>{campaign.location}</span>
-                        <span className="mx-2">•</span>
-                        <Clock className="h-3 w-3 mr-1" />
-                        <span>Até {new Date(campaign.endDate).toLocaleDateString('pt-BR')}</span>
+                  <Link key={campaign.id} href={`/campanha/${campaign.id}`}>
+                    <Card className="overflow-hidden shadow-sm hover:shadow-md transition cursor-pointer">
+                      <div className="h-40 bg-gray-200 relative">
+                        {campaign.imageUrl && (
+                          <img
+                            src={campaign.imageUrl}
+                            alt={campaign.title}
+                            className="w-full h-full object-cover"
+                          />
+                        )}
+                        {campaign.urgent && (
+                          <div className="absolute top-0 left-0 m-3 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded">
+                            URGENTE
+                          </div>
+                        )}
                       </div>
+                      <CardContent className="p-4">
+                        <h4 className="font-heading font-bold text-lg">{campaign.title}</h4>
+                        <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+                          {campaign.description}
+                        </p>
 
-                      <Link href={`/doar/${campaign.id}`}>
-                        <Button className="w-full bg-primary hover:bg-primary-dark text-white font-medium py-2 rounded transition">
-                          Doar Agora
-                        </Button>
-                      </Link>
-                    </CardContent>
-                  </Card>
+                        <div className="flex items-center text-xs text-gray-500 mb-3">
+                          <MapPin className="h-3 w-3 mr-1" />
+                          <span>{campaign.location}</span>
+                          <span className="mx-2">•</span>
+                          <Clock className="h-3 w-3 mr-1" />
+                          <span>Até {new Date(campaign.endDate).toLocaleDateString('pt-BR')}</span>
+                        </div>
+
+                        <div className="w-full flex">
+                          <Button className="w-full bg-primary hover:bg-primary-dark text-white font-medium py-2 rounded transition">
+                            Ver Detalhes
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </Link>
                 ))
               ) : (
                 <p className="col-span-3 text-center text-gray-500">
