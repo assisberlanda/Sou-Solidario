@@ -86,7 +86,7 @@ function App() {
                 return <NotFound />;
               }
               return (
-                <PageLayout>
+                <PageLayout showBackButton={true}>
                   <CampaignDetails campaignId={id} />
                 </PageLayout>
               );
