@@ -19,6 +19,9 @@ import { z } from "zod";
 const SessionStore = MemoryStore(session);
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Servir arquivos estáticos da pasta assets
+  app.use('/assets', express.static(path.join(process.cwd(), 'client/src/assets/images')));
+  
   // Configuração da sessão
   app.use(
     session({

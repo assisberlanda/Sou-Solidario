@@ -19,7 +19,7 @@ const HomePage = () => {
         {/* Background Image */}
         <div className="absolute inset-0">
           <img 
-            src="/attached_assets/download.jpeg" 
+            src="/assets/background.jpeg" 
             alt="Ajuda humanitária" 
             className="w-full h-full object-cover"
           />
@@ -319,7 +319,7 @@ const HomePage = () => {
         <div className="absolute inset-0 bg-gradient-to-tr from-[#64b5f6] to-[#4a98db] opacity-80"></div>
         <div className="absolute inset-0 z-0 opacity-20">
           <img
-            src="@assets/download.jpeg"
+            src="/assets/background.jpeg"
             alt="Ajuda humanitária"
             className="w-full h-full object-cover"
           />

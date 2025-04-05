@@ -140,7 +140,7 @@ export class MemStorage implements IStorage {
       endDate: "2023-07-30",
       createdBy: 1,
       urgent: false,
-      imageUrl: "https://images.unsplash.com/photo-1533185129825-eb4c889168d6?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=500&h=300&q=80",
+      imageUrl: "/assets/campanha-do-agasalho.jpg",
       active: true
     });
     
