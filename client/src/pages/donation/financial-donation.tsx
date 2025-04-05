@@ -318,11 +318,11 @@ export default function FinancialDonationPage() {
 
                   {donation.paymentMethod === 'deposito' && (
                     <div className="space-y-2">
-                      <p><span className="font-semibold text-gray-900">CPF:</span> <span className="text-gray-800">820.054.001-49</span></p>
+                      <p><span className="font-semibold text-gray-900">CPF:</span> <span className="text-gray-800">82005400149</span></p>
                       <p><span className="font-semibold text-gray-900">Nome:</span> <span className="text-gray-800">Assis Berlanda de Medeiros</span></p>
-                      <p><span className="font-semibold text-gray-900">Banco:</span> <span className="text-gray-800">323 - Mercado Pago</span></p>
+                      <p><span className="font-semibold text-gray-900">Banco:</span> <span className="text-gray-800">323 Mercado Pago</span></p>
                       <p><span className="font-semibold text-gray-900">Agência:</span> <span className="text-gray-800">0001</span></p>
-                      <p><span className="font-semibold text-gray-900">Conta:</span> <span className="text-gray-800">5375030-8</span></p>
+                      <p><span className="font-semibold text-gray-900">Conta:</span> <span className="text-gray-800">53750308800</span></p>
                       <p className="text-gray-700 mt-2">
                         Realize o depósito na conta acima. Após o depósito, envie o comprovante para o email contato@sousolidario.org.br
                       </p>
