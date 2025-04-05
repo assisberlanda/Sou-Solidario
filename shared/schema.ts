@@ -26,6 +26,7 @@ export const campaigns = pgTable("campaigns", {
   imageUrl: text("image_url"),
   createdAt: timestamp("created_at").defaultNow(),
   active: boolean("active").default(true),
+  uniqueCode: text("unique_code").notNull().unique(),
 });
 
 // Categorias de itens

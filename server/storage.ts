@@ -17,6 +17,7 @@ export interface IStorage {
   // Campaigns
   getCampaigns(): Promise<Campaign[]>;
   getCampaign(id: number): Promise<Campaign | undefined>;
+  getCampaignByCode(code: string): Promise<Campaign | undefined>;
   createCampaign(campaign: InsertCampaign): Promise<Campaign>;
   updateCampaign(id: number, campaign: Partial<Campaign>): Promise<Campaign | undefined>;
   deleteCampaign(id: number): Promise<boolean>;
@@ -87,6 +88,14 @@ export class MemStorage implements IStorage {
     return this.lastIds[entity];
   }
 
+  // Gerar código único para campanhas (1 letra + 5 números)
+  private generateUniqueCode(): string {
+    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const letter = letters.charAt(Math.floor(Math.random() * letters.length));
+    const numbers = Math.floor(Math.random() * 900000) + 100000; // 6 dígitos (100000-999999)
+    return `${letter}${numbers}`;
+  }
+
   // Inicializar com dados de exemplo
   private initializeData() {
     // Categorias iniciais
@@ -119,7 +128,8 @@ export class MemStorage implements IStorage {
       createdBy: 1,
       urgent: true,
       imageUrl: "/assets/porto_alegre.jpeg",
-      active: true
+      active: true,
+      uniqueCode: "P12345"
     });
     
     this.createCampaign({
@@ -130,7 +140,8 @@ export class MemStorage implements IStorage {
       createdBy: 1,
       urgent: false,
       imageUrl: "/assets/petropolis.jpeg",
-      active: true
+      active: true,
+      uniqueCode: "R67890"
     });
     
     this.createCampaign({
@@ -141,7 +152,8 @@ export class MemStorage implements IStorage {
       createdBy: 1,
       urgent: false,
       imageUrl: "/assets/campanha-do-agasalho.jpg",
-      active: true
+      active: true,
+      uniqueCode: "C24680"
     });
     
     // Itens necessários
@@ -219,10 +231,20 @@ export class MemStorage implements IStorage {
     return this.campaigns.get(id);
   }
 
+  async getCampaignByCode(code: string): Promise<Campaign | undefined> {
+    return Array.from(this.campaigns.values()).find(
+      campaign => campaign.uniqueCode === code
+    );
+  }
+
   async createCampaign(insertCampaign: InsertCampaign): Promise<Campaign> {
     const id = this.getNextId("campaigns");
     const timestamp = new Date();
-    const campaign: Campaign = { ...insertCampaign, id, createdAt: timestamp };
+    
+    // Se não foi fornecido um código único, gere um automaticamente
+    const uniqueCode = insertCampaign.uniqueCode || this.generateUniqueCode();
+    
+    const campaign: Campaign = { ...insertCampaign, id, createdAt: timestamp, uniqueCode };
     this.campaigns.set(id, campaign);
     return campaign;
   }

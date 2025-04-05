@@ -121,6 +121,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/campaigns/code/:code", async (req: Request, res: Response) => {
+    try {
+      const code = req.params.code;
+      const campaign = await storage.getCampaignByCode(code);
+      
+      if (!campaign) {
+        return res.status(404).json({ message: "Campanha não encontrada" });
+      }
+      
+      return res.json(campaign);
+    } catch (error) {
+      return res.status(500).json({ message: "Erro ao buscar campanha pelo código" });
+    }
+  });
+
   app.get("/api/campaigns/:id", async (req: Request, res: Response) => {
     try {
       const id = parseInt(req.params.id);
@@ -179,6 +194,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+
+
   // Gerar QR Code para campanha
   app.get("/api/campaigns/:id/qrcode", async (req: Request, res: Response) => {
     try {
@@ -189,9 +206,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Campanha não encontrada" });
       }
       
-      // Gerar URL com base no domínio da requisição
+      // Gerar URL com base no domínio da requisição e no código único da campanha
       const baseUrl = `${req.protocol}://${req.get('host')}`;
-      const campaignUrl = `${baseUrl}/doar/${id}`;
+      const campaignUrl = `${baseUrl}/doar/codigo/${campaign.uniqueCode}`;
       
       // Gerar QR Code como string base64
       const qrCodeDataUrl = await QRCode.toDataURL(campaignUrl);

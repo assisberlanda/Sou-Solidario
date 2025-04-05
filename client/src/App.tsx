@@ -20,6 +20,7 @@ import Schedule from "@/pages/donation/schedule";
 import Confirmation from "@/pages/donation/confirmation";
 import QrScannerPage from "@/pages/donation/qr-scanner";
 import FinancialDonationPage from "@/pages/donation/financial-donation";
+import CampaignByCode from "@/pages/donation/campaign-by-code";
 import AdminLogin from "@/pages/admin";
 import AdminDashboard from "@/pages/admin/dashboard";
 import CampaignForm from "@/pages/admin/campaign-form";
@@ -190,6 +191,22 @@ function App() {
                 <FinancialDonationPage />
               </PageLayout>
             )}
+          </Route>
+          
+          <Route path="/doar/codigo/:code">
+            {(params) => {
+              return (
+                <PageLayout>
+                  <CampaignByCode 
+                    code={params.code} 
+                    onCampaignSelect={(campaignId) => {
+                      setDonationState({ ...donationState, campaignId });
+                      navigate(`/doar/items/${campaignId}`);
+                    }}
+                  />
+                </PageLayout>
+              );
+            }}
           </Route>
           
           <Route path="/doar/:id">

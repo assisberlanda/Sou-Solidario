@@ -26,18 +26,28 @@ const QrScannerPage = ({ onCampaignSelect }: QrScannerPageProps) => {
       // Verificar se o QR code contém uma URL válida
       const url = new URL(data);
       
-      // Extrair o ID da campanha da URL
-      // Assumindo que o formato é algo como /doar/123
+      // Extrair o ID ou código da campanha da URL
+      // Verificar se o formato é /doar/codigo/X12345
       const pathParts = url.pathname.split("/");
-      const campaignId = parseInt(pathParts[pathParts.length - 1]);
       
-      if (!isNaN(campaignId)) {
+      if (pathParts.includes("codigo") && pathParts.length >= 4) {
+        // Se for um código único, navegamos para a rota específica
+        const code = pathParts[pathParts.length - 1];
         setTimeout(() => {
-          onCampaignSelect(campaignId);
-          navigate(`/doar/${campaignId}`);
+          navigate(`/doar/codigo/${code}`);
         }, 1500);
       } else {
-        throw new Error("QR Code inválido");
+        // Caso contrário, tentar encontrar o ID numérico
+        const campaignId = parseInt(pathParts[pathParts.length - 1]);
+        
+        if (!isNaN(campaignId)) {
+          setTimeout(() => {
+            onCampaignSelect(campaignId);
+            navigate(`/doar/${campaignId}`);
+          }, 1500);
+        } else {
+          throw new Error("QR Code inválido");
+        }
       }
     } catch (error) {
       console.error("QR Code inválido:", error);
