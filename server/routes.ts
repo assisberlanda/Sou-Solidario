@@ -1,7 +1,15 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { loginSchema, insertCampaignSchema, insertNeededItemSchema, insertDonationSchema, insertDonationItemSchema } from "@shared/schema";
+import { 
+  loginSchema, 
+  insertCampaignSchema, 
+  insertNeededItemSchema, 
+  insertDonationSchema, 
+  insertDonationItemSchema,
+  insertFinancialDonationSchema,
+  financialDonationProcessSchema
+} from "@shared/schema";
 import QRCode from "qrcode";
 import session from "express-session";
 import MemoryStore from "memorystore";
@@ -338,6 +346,93 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(500).json({ message: "Erro ao atualizar status da doação" });
     }
   });
+  
+  // Rotas de Doações Financeiras
+  app.post("/api/financial-donations", async (req: Request, res: Response) => {
+    try {
+      // Validar e processar os dados da doação financeira
+      const validatedData = financialDonationProcessSchema.parse(req.body);
+      
+      // Informações da conta bancária para doação (em um ambiente real, estas seriam definidas para cada campanha)
+      const accountInfo = {
+        banco: "Banco do Brasil",
+        agencia: "1234-5",
+        conta: "12345-6",
+        pix: "contato@sousolidario.org.br",
+        favorecido: "Associação Sou Solidário"
+      };
+      
+      // Preparar os dados para salvar no banco
+      const financialDonation = await storage.createFinancialDonation({
+        campaignId: validatedData.campaignId,
+        donorName: validatedData.donorName,
+        donorEmail: validatedData.donorEmail,
+        donorPhone: validatedData.donorPhone,
+        amount: validatedData.amount,
+        paymentMethod: validatedData.paymentMethod,
+        accountInfo: JSON.stringify(accountInfo),
+        message: validatedData.message,
+        status: "pendente"
+      });
+      
+      return res.status(201).json({
+        ...financialDonation,
+        accountInfo
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: error.errors });
+      }
+      console.error(error);
+      return res.status(500).json({ message: "Erro ao registrar doação financeira" });
+    }
+  });
+  
+  app.get("/api/financial-donations", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const campaignId = req.query.campaignId ? parseInt(req.query.campaignId as string) : undefined;
+      const donations = await storage.getFinancialDonations(campaignId);
+      return res.json(donations);
+    } catch (error) {
+      return res.status(500).json({ message: "Erro ao buscar doações financeiras" });
+    }
+  });
+  
+  app.get("/api/financial-donations/:id", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const donation = await storage.getFinancialDonation(id);
+      
+      if (!donation) {
+        return res.status(404).json({ message: "Doação financeira não encontrada" });
+      }
+      
+      return res.json(donation);
+    } catch (error) {
+      return res.status(500).json({ message: "Erro ao buscar doação financeira" });
+    }
+  });
+  
+  app.put("/api/financial-donations/:id/status", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const { status } = req.body;
+      
+      if (!status || typeof status !== 'string') {
+        return res.status(400).json({ message: "Status inválido" });
+      }
+      
+      const updatedDonation = await storage.updateFinancialDonationStatus(id, status);
+      
+      if (!updatedDonation) {
+        return res.status(404).json({ message: "Doação financeira não encontrada" });
+      }
+      
+      return res.json(updatedDonation);
+    } catch (error) {
+      return res.status(500).json({ message: "Erro ao atualizar status da doação financeira" });
+    }
+  });
 
   // API do Chatbot (simplificada)
   app.post("/api/chat", async (req: Request, res: Response) => {
@@ -354,8 +449,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const messageLower = message.toLowerCase();
       
       if (messageLower.includes("como doar") || messageLower.includes("fazer doação")) {
-        response = "Para fazer uma doação, selecione uma campanha, escolha os itens que deseja doar, informe seus dados e agende a coleta. É simples e rápido!";
-      } 
+        response = "Para fazer uma doação de itens, selecione uma campanha, escolha os itens que deseja doar, informe seus dados e agende a coleta. É simples e rápido! Você também pode fazer uma doação financeira por PIX, transferência ou depósito bancário.";
+      }
+      else if (messageLower.includes("dinheiro") || messageLower.includes("financeira") || messageLower.includes("pix") || messageLower.includes("transferência") || messageLower.includes("depósito")) {
+        response = "Para fazer uma doação financeira, selecione uma campanha, clique em 'Doar em Dinheiro', informe o valor e escolha entre PIX, transferência bancária ou depósito. Todas as informações para pagamento serão fornecidas após o preenchimento do formulário.";
+      }
       else if (messageLower.includes("endereço") || messageLower.includes("local")) {
         response = "Não é necessário levar suas doações a um ponto de coleta. Nós iremos até você! Basta informar seu endereço e agendar um horário que seja conveniente.";
       }

@@ -71,6 +71,21 @@ export const donationItems = pgTable("donation_items", {
   quantity: integer("quantity").notNull(),
 });
 
+// Doações financeiras
+export const financialDonations = pgTable("financial_donations", {
+  id: serial("id").primaryKey(),
+  campaignId: integer("campaign_id").notNull(),
+  donorName: text("donor_name").notNull(),
+  donorEmail: text("donor_email").notNull(),
+  donorPhone: text("donor_phone").notNull(),
+  amount: integer("amount").notNull(),
+  paymentMethod: text("payment_method").notNull(),
+  accountInfo: text("account_info").notNull(),
+  message: text("message"),
+  status: text("status").notNull().default("pending"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Schemas para inserção
 export const insertUserSchema = createInsertSchema(users).omit({ id: true, createdAt: true });
 export const insertCampaignSchema = createInsertSchema(campaigns).omit({ id: true, createdAt: true });
@@ -78,6 +93,7 @@ export const insertCategorySchema = createInsertSchema(categories).omit({ id: tr
 export const insertNeededItemSchema = createInsertSchema(neededItems).omit({ id: true });
 export const insertDonationSchema = createInsertSchema(donations).omit({ id: true, createdAt: true });
 export const insertDonationItemSchema = createInsertSchema(donationItems).omit({ id: true });
+export const insertFinancialDonationSchema = createInsertSchema(financialDonations).omit({ id: true, createdAt: true });
 
 // Schemas para mensagens do chat
 export const chatMessageSchema = z.object({
@@ -108,6 +124,18 @@ export const donationProcessSchema = z.object({
   pickupTime: z.string().min(1, { message: "Horário de coleta é obrigatório" }),
 });
 
+export const financialDonationProcessSchema = z.object({
+  campaignId: z.number(),
+  donorName: z.string().min(1, { message: "Nome é obrigatório" }),
+  donorEmail: z.string().email({ message: "Email inválido" }),
+  donorPhone: z.string().min(10, { message: "Telefone é obrigatório" }),
+  amount: z.number().min(1, { message: "Valor deve ser maior que zero" }),
+  paymentMethod: z.enum(["pix", "transferencia", "deposito"], { 
+    errorMap: () => ({ message: "Selecione um método de pagamento válido" }) 
+  }),
+  message: z.string().optional(),
+});
+
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -126,5 +154,9 @@ export type InsertDonation = z.infer<typeof insertDonationSchema>;
 
 export type DonationItem = typeof donationItems.$inferSelect;
 export type InsertDonationItem = z.infer<typeof insertDonationItemSchema>;
+
+export type FinancialDonation = typeof financialDonations.$inferSelect;
+export type InsertFinancialDonation = z.infer<typeof insertFinancialDonationSchema>;
+export type FinancialDonationProcess = z.infer<typeof financialDonationProcessSchema>;
 
 export type ChatMessage = z.infer<typeof chatMessageSchema>;

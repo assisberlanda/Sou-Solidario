@@ -4,7 +4,8 @@ import {
   categories, type Category, type InsertCategory,
   neededItems, type NeededItem, type InsertNeededItem,
   donations, type Donation, type InsertDonation,
-  donationItems, type DonationItem, type InsertDonationItem
+  donationItems, type DonationItem, type InsertDonationItem,
+  financialDonations, type FinancialDonation, type InsertFinancialDonation
 } from "@shared/schema";
 
 export interface IStorage {
@@ -41,6 +42,12 @@ export interface IStorage {
   // Donation Items
   getDonationItems(donationId: number): Promise<DonationItem[]>;
   createDonationItem(donationItem: InsertDonationItem): Promise<DonationItem>;
+  
+  // Financial Donations
+  getFinancialDonations(campaignId?: number): Promise<FinancialDonation[]>;
+  getFinancialDonation(id: number): Promise<FinancialDonation | undefined>;
+  createFinancialDonation(donation: InsertFinancialDonation): Promise<FinancialDonation>;
+  updateFinancialDonationStatus(id: number, status: string): Promise<FinancialDonation | undefined>;
 }
 
 export class MemStorage implements IStorage {
@@ -50,6 +57,7 @@ export class MemStorage implements IStorage {
   private neededItems: Map<number, NeededItem>;
   private donations: Map<number, Donation>;
   private donationItems: Map<number, DonationItem>;
+  private financialDonations: Map<number, FinancialDonation>;
   private lastIds: { [key: string]: number };
 
   constructor() {
@@ -59,13 +67,15 @@ export class MemStorage implements IStorage {
     this.neededItems = new Map();
     this.donations = new Map();
     this.donationItems = new Map();
+    this.financialDonations = new Map();
     this.lastIds = {
       users: 0,
       campaigns: 0,
       categories: 0,
       neededItems: 0,
       donations: 0,
-      donationItems: 0
+      donationItems: 0,
+      financialDonations: 0
     };
     
     // Inicializando com dados de exemplo
@@ -317,6 +327,36 @@ export class MemStorage implements IStorage {
     const donationItem: DonationItem = { ...insertDonationItem, id };
     this.donationItems.set(id, donationItem);
     return donationItem;
+  }
+
+  // Financial Donations
+  async getFinancialDonations(campaignId?: number): Promise<FinancialDonation[]> {
+    let donations = Array.from(this.financialDonations.values());
+    if (campaignId) {
+      donations = donations.filter(donation => donation.campaignId === campaignId);
+    }
+    return donations;
+  }
+
+  async getFinancialDonation(id: number): Promise<FinancialDonation | undefined> {
+    return this.financialDonations.get(id);
+  }
+
+  async createFinancialDonation(insertDonation: InsertFinancialDonation): Promise<FinancialDonation> {
+    const id = this.getNextId("financialDonations");
+    const timestamp = new Date();
+    const donation: FinancialDonation = { ...insertDonation, id, createdAt: timestamp };
+    this.financialDonations.set(id, donation);
+    return donation;
+  }
+
+  async updateFinancialDonationStatus(id: number, status: string): Promise<FinancialDonation | undefined> {
+    const donation = this.financialDonations.get(id);
+    if (!donation) return undefined;
+    
+    const updatedDonation = { ...donation, status };
+    this.financialDonations.set(id, updatedDonation);
+    return updatedDonation;
   }
 }
 

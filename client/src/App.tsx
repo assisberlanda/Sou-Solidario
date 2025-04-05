@@ -16,6 +16,7 @@ import DonorInfo from "@/pages/donation/donor-info";
 import Schedule from "@/pages/donation/schedule";
 import Confirmation from "@/pages/donation/confirmation";
 import QrScannerPage from "@/pages/donation/qr-scanner";
+import FinancialDonationPage from "@/pages/donation/financial-donation";
 import AdminLogin from "@/pages/admin";
 import AdminDashboard from "@/pages/admin/dashboard";
 import CampaignForm from "@/pages/admin/campaign-form";
@@ -145,6 +146,12 @@ function App() {
                   setDonationState({ ...donationState, campaignId })
                 }
               />
+            )}
+          </Route>
+          
+          <Route path="/doar/financeira/:id">
+            {(params) => (
+              <FinancialDonationPage />
             )}
           </Route>
           

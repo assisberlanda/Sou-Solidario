@@ -5,9 +5,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import ChatBot from "@/components/ChatBot";
 import { Campaign, NeededItem, Category } from "@shared/schema";
-import { ArrowRight, ArrowLeft, AlertTriangle } from "lucide-react";
+import { ArrowRight, ArrowLeft, AlertTriangle, DollarSign, ShoppingBag } from "lucide-react";
 
 interface CampaignItemsProps {
   campaignId: number;
@@ -153,12 +154,49 @@ const CampaignItems = ({ campaignId, onItemsSelect }: CampaignItemsProps) => {
 
           <div className="mb-6">
             <h3 className="text-xl font-heading font-semibold mb-2">
-              Selecione os itens que deseja doar
+              Como você deseja ajudar?
             </h3>
             <p className="text-gray-600">
               Campanha: <strong>{campaign.title}</strong>
             </p>
             <p className="text-sm text-gray-500 mt-1 mb-4">{campaign.description}</p>
+            
+            {/* Opções de doação */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+              {/* Opção de doação de itens */}
+              <div className="border rounded-lg p-5 bg-white hover:border-primary transition-colors">
+                <div className="flex items-center mb-3">
+                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mr-3">
+                    <ShoppingBag className="h-5 w-5 text-primary" />
+                  </div>
+                  <h4 className="font-medium text-lg">Doar Itens</h4>
+                </div>
+                <p className="text-sm text-gray-600 mb-4">
+                  Selecione itens específicos para doar, como alimentos, roupas, produtos de higiene, etc.
+                </p>
+              </div>
+              
+              {/* Opção de doação financeira */}
+              <Link href={`/doar/financeira/${campaignId}`}>
+                <div className="border rounded-lg p-5 bg-white hover:border-primary transition-colors cursor-pointer">
+                  <div className="flex items-center mb-3">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mr-3">
+                      <DollarSign className="h-5 w-5 text-primary" />
+                    </div>
+                    <h4 className="font-medium text-lg">Doar em Dinheiro</h4>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Faça uma contribuição financeira por PIX, transferência ou depósito bancário.
+                  </p>
+                </div>
+              </Link>
+            </div>
+            
+            <Separator className="my-6" />
+            
+            <h3 className="text-xl font-heading font-semibold mb-4">
+              Selecione os itens que deseja doar
+            </h3>
             
             <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg mb-6 flex items-start">
               <AlertTriangle className="text-amber-500 h-5 w-5 mr-3 flex-shrink-0 mt-0.5" />
