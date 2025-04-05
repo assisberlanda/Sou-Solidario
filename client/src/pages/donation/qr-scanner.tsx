@@ -97,7 +97,8 @@ const QrScannerPage = ({ onCampaignSelect }: QrScannerPageProps) => {
                 </p>
                 <Button
                   onClick={() => setOpenScanner(true)}
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground flex items-center"
+                  variant="default"
+                  className="flex items-center"
                 >
                   <Scan className="mr-2 h-4 w-4" />
                   Abrir Scanner
