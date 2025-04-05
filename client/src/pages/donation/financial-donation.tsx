@@ -304,26 +304,33 @@ export default function FinancialDonationPage() {
               </h3>
 
               {donation.accountInfo && (
-                <div className="space-y-2 text-sm">
+                <div className="space-y-4 text-sm">
                   {donation.paymentMethod === 'pix' && (
                     <>
-                      <p><span className="font-semibold text-gray-900">Chave PIX:</span> <span className="text-gray-800">{donation.accountInfo.pix}</span></p>
-                      <p className="text-gray-700 mt-1">Faça o pagamento usando a chave PIX acima. O pagamento é processado instantaneamente.</p>
+                      <div className="flex flex-col items-center space-y-3">
+                        <img src="/assets/qr-code-pix.png" alt="QR Code PIX" className="w-48 h-48" />
+                        <p><span className="font-semibold text-gray-900">Chave PIX:</span> <span className="text-gray-800">82005400149</span></p>
+                        <p><span className="font-semibold text-gray-900">Beneficiário:</span> <span className="text-gray-800">Assis Berlanda de Medeiros</span></p>
+                        <p className="text-gray-700 mt-1">Faça o pagamento usando o QR Code ou a chave PIX acima. O pagamento é processado instantaneamente.</p>
+                      </div>
                     </>
                   )}
 
-                  {(donation.paymentMethod === 'cartao' || donation.paymentMethod === 'deposito') && (
-                    <>
-                      <p><span className="font-semibold text-gray-900">Banco:</span> <span className="text-gray-800">{donation.accountInfo.banco}</span></p>
-                      <p><span className="font-semibold text-gray-900">Agência:</span> <span className="text-gray-800">{donation.accountInfo.agencia}</span></p>
-                      <p><span className="font-semibold text-gray-900">Conta:</span> <span className="text-gray-800">{donation.accountInfo.conta}</span></p>
-                      <p><span className="font-semibold text-gray-900">Favorecido:</span> <span className="text-gray-800">{donation.accountInfo.favorecido}</span></p>
+                  {donation.paymentMethod === 'deposito' && (
+                    <div className="space-y-2">
+                      <p><span className="font-semibold text-gray-900">CPF:</span> <span className="text-gray-800">820.054.001-49</span></p>
+                      <p><span className="font-semibold text-gray-900">Nome:</span> <span className="text-gray-800">Assis Berlanda de Medeiros</span></p>
+                      <p><span className="font-semibold text-gray-900">Banco:</span> <span className="text-gray-800">323 - Mercado Pago</span></p>
+                      <p><span className="font-semibold text-gray-900">Agência:</span> <span className="text-gray-800">0001</span></p>
+                      <p><span className="font-semibold text-gray-900">Conta:</span> <span className="text-gray-800">5375030-8</span></p>
                       <p className="text-gray-700 mt-2">
-                        {donation.paymentMethod === 'cartao' 
-                          ? "Pagamento processado via cartão de crédito."
-                          : "Realize o depósito na conta acima. Após o depósito, envie o comprovante para o email contato@sousolidario.org.br"}
+                        Realize o depósito na conta acima. Após o depósito, envie o comprovante para o email contato@sousolidario.org.br
                       </p>
-                    </>
+                    </div>
+                  )}
+
+                  {donation.paymentMethod === 'cartao' && (
+                    <p className="text-gray-700">Pagamento processado via cartão de crédito.</p>
                   )}
                 </div>
               )}
