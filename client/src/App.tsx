@@ -149,21 +149,27 @@ function App() {
             )}
           </Route>
           
-          <Route path="/doar/financeira/:id">
+          <Route path="/doacao-financeira/:id">
             {(params) => (
               <FinancialDonationPage />
             )}
           </Route>
           
           <Route path="/doar/:id">
-            {(params) => (
-              <ItemSelection 
-                campaignId={parseInt(params.id)} 
-                onItemsSelect={(items) => 
-                  setDonationState({ ...donationState, campaignId: parseInt(params.id), items })
-                }
-              />
-            )}
+            {(params) => {
+              const id = parseInt(params.id);
+              if (isNaN(id)) {
+                return <NotFound />;
+              }
+              return (
+                <ItemSelection 
+                  campaignId={id} 
+                  onItemsSelect={(items) => 
+                    setDonationState({ ...donationState, campaignId: id, items })
+                  }
+                />
+              );
+            }}
           </Route>
           
           <Route path="/qrcode">

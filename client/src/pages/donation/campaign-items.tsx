@@ -177,7 +177,7 @@ const CampaignItems = ({ campaignId, onItemsSelect }: CampaignItemsProps) => {
               </div>
               
               {/* Opção de doação financeira */}
-              <Link href={`/doar/financeira/${campaignId}`}>
+              <Link href={`/doacao-financeira/${campaignId}`}>
                 <div className="border rounded-lg p-5 bg-white hover:border-primary transition-colors cursor-pointer">
                   <div className="flex items-center mb-3">
                     <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mr-3">

@@ -20,6 +20,7 @@ type FinancialDonationForm = z.infer<typeof financialDonationProcessSchema>;
 
 export default function FinancialDonationPage() {
   const { id } = useParams();
+  console.log("ID da campanha (financeira):", id);
   const campaignId = id ? parseInt(id) : 0;
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
