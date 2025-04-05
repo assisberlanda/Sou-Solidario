@@ -16,11 +16,12 @@ const HomePage = () => {
     <div className="container mx-auto px-4 py-6">
       {/* Hero Section */}
       <section className="relative bg-gradient-to-r from-[#26c485] to-[#1eaa70] text-white rounded-xl p-8 mb-12 overflow-hidden">
-        {/* Fundo com a imagem SVG de solidariedade */}
-        <div className="absolute inset-0 z-0 opacity-20">
+        {/* Fundo com a imagem de ajuda humanitária */}
+        <div className="absolute inset-0 z-0">
+          <div className="absolute inset-0 bg-gradient-to-r from-[#26c485]/90 to-[#1eaa70]/90"></div>
           <img
-            src="/src/assets/humanitarian-aid.svg"
-            alt="Mãos solidárias"
+            src="@assets/download.jpeg"
+            alt="Ajuda humanitária"
             className="w-full h-full object-cover"
           />
         </div>
@@ -314,9 +315,9 @@ const HomePage = () => {
       <section className="relative bg-[#64b5f6] rounded-xl p-8 text-white text-center overflow-hidden">
         {/* Background effect */}
         <div className="absolute inset-0 bg-gradient-to-tr from-[#64b5f6] to-[#4a98db] opacity-80"></div>
-        <div className="absolute inset-0 z-0 opacity-15">
+        <div className="absolute inset-0 z-0 opacity-20">
           <img
-            src="/src/assets/humanitarian-aid.svg"
+            src="@assets/download.jpeg"
             alt="Ajuda humanitária"
             className="w-full h-full object-cover"
           />
