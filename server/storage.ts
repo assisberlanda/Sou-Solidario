@@ -118,7 +118,7 @@ export class MemStorage implements IStorage {
       endDate: "2023-08-30",
       createdBy: 1,
       urgent: true,
-      imageUrl: "https://images.unsplash.com/photo-1601059281396-aa44637abf81?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=500&h=300&q=80",
+      imageUrl: "/assets/porto_alegre.jpeg",
       active: true
     });
     
@@ -129,7 +129,7 @@ export class MemStorage implements IStorage {
       endDate: "2023-09-15",
       createdBy: 1,
       urgent: false,
-      imageUrl: "https://images.unsplash.com/photo-1587063692074-fa2c36cd1485?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=500&h=300&q=80",
+      imageUrl: "/assets/petropolis.jpeg",
       active: true
     });
     

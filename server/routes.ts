@@ -1,5 +1,6 @@
-import type { Express, Request, Response } from "express";
+import express, { type Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
+import path from "path";
 import { storage } from "./storage";
 import { 
   loginSchema, 
@@ -499,6 +500,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(500).json({ message: "Erro ao processar mensagem" });
     }
   });
+
+  // Servir imagens da pasta de assets
+  app.use("/assets", express.static(path.join(process.cwd(), "client/src/assets/images")));
 
   const httpServer = createServer(app);
 
