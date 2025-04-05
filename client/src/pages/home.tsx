@@ -15,8 +15,16 @@ const HomePage = () => {
   return (
     <div className="container mx-auto px-4 py-6">
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-primary to-primary-dark text-white rounded-xl p-8 mb-12">
-        <div className="max-w-3xl mx-auto text-center">
+      <section className="relative bg-gradient-to-r from-[#26c485] to-[#1eaa70] text-white rounded-xl p-8 mb-12 overflow-hidden">
+        {/* Fundo com a imagem SVG de solidariedade */}
+        <div className="absolute inset-0 z-0 opacity-20">
+          <img
+            src="/src/assets/humanitarian-aid.svg"
+            alt="Mãos solidárias"
+            className="w-full h-full object-cover"
+          />
+        </div>
+        <div className="relative z-10 max-w-3xl mx-auto text-center">
           <h1 className="text-3xl md:text-4xl font-heading font-bold mb-4">
             Ajude quem mais precisa em momentos de crise
           </h1>
@@ -25,7 +33,7 @@ const HomePage = () => {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/doar/campanha">
-              <Button className="bg-accent hover:bg-accent-dark text-neutral-dark font-accent font-semibold px-6 py-3 h-auto text-base">
+              <Button className="btn-compassion font-semibold px-6 py-3 h-auto text-base">
                 Quero Doar Agora
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
@@ -268,8 +276,8 @@ const HomePage = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card className="text-center">
             <CardContent className="pt-6">
-              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Search className="h-8 w-8 text-primary" />
+              <div className="w-16 h-16 bg-hope-light rounded-full flex items-center justify-center mx-auto mb-4">
+                <Search className="h-8 w-8 text-hope" />
               </div>
               <h3 className="text-lg font-heading font-semibold mb-2">1. Escolha uma Campanha</h3>
               <p className="text-gray-600 text-sm">
@@ -279,8 +287,8 @@ const HomePage = () => {
           </Card>
           <Card className="text-center">
             <CardContent className="pt-6">
-              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Heart className="h-8 w-8 text-primary" />
+              <div className="w-16 h-16 bg-compassion-light rounded-full flex items-center justify-center mx-auto mb-4">
+                <Heart className="h-8 w-8 text-compassion" />
               </div>
               <h3 className="text-lg font-heading font-semibold mb-2">2. Selecione Itens para Doar</h3>
               <p className="text-gray-600 text-sm">
@@ -290,8 +298,8 @@ const HomePage = () => {
           </Card>
           <Card className="text-center">
             <CardContent className="pt-6">
-              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Clock className="h-8 w-8 text-primary" />
+              <div className="w-16 h-16 bg-peace-light rounded-full flex items-center justify-center mx-auto mb-4">
+                <Clock className="h-8 w-8 text-peace" />
               </div>
               <h3 className="text-lg font-heading font-semibold mb-2">3. Agende a Coleta</h3>
               <p className="text-gray-600 text-sm">
@@ -303,19 +311,31 @@ const HomePage = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="bg-secondary rounded-xl p-8 text-white text-center">
-        <h2 className="text-2xl font-heading font-bold mb-4">
-          Faça a diferença hoje mesmo!
-        </h2>
-        <p className="max-w-2xl mx-auto mb-6">
-          Sua doação pode transformar a vida de pessoas afetadas por desastres naturais e emergências.
-          Não importa o tamanho da sua contribuição, cada item doado tem um impacto significativo.
-        </p>
-        <Link href="/doar/campanha">
-          <Button className="bg-white text-secondary hover:bg-gray-100 px-6 py-3 h-auto text-base font-semibold">
-            Quero Doar Agora
-          </Button>
-        </Link>
+      <section className="relative bg-[#64b5f6] rounded-xl p-8 text-white text-center overflow-hidden">
+        {/* Background effect */}
+        <div className="absolute inset-0 bg-gradient-to-tr from-[#64b5f6] to-[#4a98db] opacity-80"></div>
+        <div className="absolute inset-0 z-0 opacity-15">
+          <img
+            src="/src/assets/humanitarian-aid.svg"
+            alt="Ajuda humanitária"
+            className="w-full h-full object-cover"
+          />
+        </div>
+        
+        <div className="relative z-10">
+          <h2 className="text-2xl font-heading font-bold mb-4">
+            Faça a diferença hoje mesmo!
+          </h2>
+          <p className="max-w-2xl mx-auto mb-6">
+            Sua doação pode transformar a vida de pessoas afetadas por desastres naturais e emergências.
+            Não importa o tamanho da sua contribuição, cada item doado tem um impacto significativo.
+          </p>
+          <Link href="/doar/campanha">
+            <Button className="btn-compassion px-6 py-3 h-auto text-base font-semibold">
+              Quero Doar Agora
+            </Button>
+          </Link>
+        </div>
       </section>
     </div>
   );

@@ -125,7 +125,7 @@ const CampaignSelection = ({ onCampaignSelect }: CampaignSelectionProps) => {
                   onClick={() => handleSelectCampaign(campaign.id)}
                 >
                   <div className="flex items-start">
-                    <div className={`bg-${campaign.urgent ? 'red' : 'amber'}-100 text-${campaign.urgent ? 'red' : 'amber'}-600 p-3 rounded-lg mr-4`}>
+                    <div className={`${campaign.urgent ? 'bg-compassion-light text-[#e86c00]' : 'bg-hope-light text-[#1eaa70]'} p-3 rounded-lg mr-4`}>
                       {campaign.title.toLowerCase().includes("enchente") ? (
                         <Droplet className="h-6 w-6" />
                       ) : campaign.title.toLowerCase().includes("reconstrução") ? (
@@ -146,11 +146,11 @@ const CampaignSelection = ({ onCampaignSelect }: CampaignSelectionProps) => {
                         <span>{campaign.location}</span>
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="text-xs font-medium text-primary flex items-center">
+                        <span className="text-xs font-medium text-peace flex items-center">
                           <Clock className="h-3 w-3 mr-1" />
                           Até {new Date(campaign.endDate).toLocaleDateString("pt-BR")}
                         </span>
-                        <span className="text-sm font-medium text-secondary hover:text-secondary-dark">
+                        <span className="text-sm font-medium text-hope hover:text-[#1eaa70]">
                           Ver detalhes
                         </span>
                       </div>
@@ -167,7 +167,7 @@ const CampaignSelection = ({ onCampaignSelect }: CampaignSelectionProps) => {
           <div className="flex flex-col md:flex-row items-center gap-4">
             <Button
               onClick={() => setOpenScanner(true)}
-              className="flex items-center bg-secondary text-white px-4 py-2 rounded-lg hover:bg-secondary-dark transition"
+              className="flex items-center btn-peace px-4 py-2 rounded-lg transition"
             >
               <QrCode className="mr-2 h-4 w-4" />
               Escanear QR Code
@@ -190,7 +190,7 @@ const CampaignSelection = ({ onCampaignSelect }: CampaignSelectionProps) => {
               <Button variant="outline">Cancelar</Button>
             </Link>
             <Link href="/campanhas">
-              <Button className="bg-primary hover:bg-primary-dark text-white font-medium">
+              <Button className="btn-hope font-medium">
                 Ver Todas as Campanhas
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>

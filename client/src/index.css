@@ -2,6 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --color-hope: #26c485;        /* Verde esperança */
+  --color-peace: #64b5f6;       /* Azul paz */
+  --color-compassion: #ffb74d;  /* Laranja compaixão */
+  --color-unity: #ba68c8;       /* Roxo unidade */
+  --color-healing: #81c784;     /* Verde cura */
+}
+
 @layer base {
   * {
     @apply border-border;
@@ -9,5 +17,59 @@
 
   body {
     @apply font-sans antialiased bg-background text-foreground;
+  }
+
+  .font-heading {
+    @apply font-semibold tracking-tight;
+  }
+}
+
+@layer components {
+  .btn-hope {
+    @apply bg-[#26c485] hover:bg-[#1eaa70] text-white;
+  }
+  
+  .btn-peace {
+    @apply bg-[#64b5f6] hover:bg-[#4a98db] text-white;
+  }
+  
+  .btn-compassion {
+    @apply bg-[#ffb74d] hover:bg-[#f5a02c] text-white;
+  }
+
+  .border-hope {
+    @apply border-[#26c485];
+  }
+
+  .border-peace {
+    @apply border-[#64b5f6];
+  }
+
+  .border-compassion {
+    @apply border-[#ffb74d];
+  }
+
+  .text-hope {
+    @apply text-[#26c485];
+  }
+
+  .text-peace {
+    @apply text-[#64b5f6];
+  }
+
+  .text-compassion {
+    @apply text-[#ffb74d];
+  }
+
+  .bg-hope-light {
+    @apply bg-[#e6f9f1];
+  }
+
+  .bg-peace-light {
+    @apply bg-[#e8f4fd];
+  }
+
+  .bg-compassion-light {
+    @apply bg-[#fff5e6];
   }
 }
