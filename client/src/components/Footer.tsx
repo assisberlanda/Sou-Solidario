@@ -127,6 +127,8 @@ const Footer = () => {
         <div className="border-t border-[#ffb74d]/20 mt-8 pt-6 flex flex-col md:flex-row justify-between items-center">
           <p className="text-sm text-[#ffcc80]">
             © {new Date().getFullYear()} Sou Solidário. Todos os direitos reservados.
+            <br />
+            Desenvolvido por Seu Nome
           </p>
           <div className="flex space-x-4 mt-4 md:mt-0">
             <a href="#" className="text-sm text-[#ffcc80] hover:text-[#ffb74d] transition">
