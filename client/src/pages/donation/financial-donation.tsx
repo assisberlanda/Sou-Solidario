@@ -113,7 +113,7 @@ export default function FinancialDonationPage() {
                     <FormItem>
                       <FormLabel>Nome Completo</FormLabel>
                       <FormControl>
-                        <Input placeholder="Digite seu nome completo" {...field} />
+                        <Input placeholder="Digite seu nome completo" className="bg-white" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -128,7 +128,7 @@ export default function FinancialDonationPage() {
                       <FormItem>
                         <FormLabel>E-mail</FormLabel>
                         <FormControl>
-                          <Input type="email" placeholder="seu.email@exemplo.com" {...field} />
+                          <Input type="email" placeholder="seu.email@exemplo.com" className="bg-white" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -142,7 +142,7 @@ export default function FinancialDonationPage() {
                       <FormItem>
                         <FormLabel>Telefone</FormLabel>
                         <FormControl>
-                          <Input placeholder="(00) 00000-0000" {...field} />
+                          <Input placeholder="(00) 00000-0000" className="bg-white" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -160,7 +160,8 @@ export default function FinancialDonationPage() {
                         <Input 
                           type="number" 
                           min={1} 
-                          step={1} 
+                          step={1}
+                          className="bg-white"
                           {...field}
                           onChange={(e) => field.onChange(parseInt(e.target.value))}
                         />
@@ -182,24 +183,24 @@ export default function FinancialDonationPage() {
                           defaultValue={field.value}
                           className="flex flex-col space-y-1"
                         >
-                          <div className="flex items-center space-x-2 rounded-md border p-3 hover:bg-muted">
+                          <div className="flex items-center space-x-2 rounded-md border border-gray-300 p-3 hover:bg-gray-50 bg-white">
                             <RadioGroupItem value="pix" id="pix" />
-                            <Label htmlFor="pix" className="flex items-center">
-                              <QrCode className="mr-2 h-5 w-5" />
+                            <Label htmlFor="pix" className="flex items-center font-medium text-gray-800">
+                              <QrCode className="mr-2 h-5 w-5 text-primary" />
                               PIX
                             </Label>
                           </div>
-                          <div className="flex items-center space-x-2 rounded-md border p-3 hover:bg-muted">
+                          <div className="flex items-center space-x-2 rounded-md border border-gray-300 p-3 hover:bg-gray-50 bg-white">
                             <RadioGroupItem value="transferencia" id="transferencia" />
-                            <Label htmlFor="transferencia" className="flex items-center">
-                              <CreditCard className="mr-2 h-5 w-5" />
+                            <Label htmlFor="transferencia" className="flex items-center font-medium text-gray-800">
+                              <CreditCard className="mr-2 h-5 w-5 text-primary" />
                               Transferência Bancária
                             </Label>
                           </div>
-                          <div className="flex items-center space-x-2 rounded-md border p-3 hover:bg-muted">
+                          <div className="flex items-center space-x-2 rounded-md border border-gray-300 p-3 hover:bg-gray-50 bg-white">
                             <RadioGroupItem value="deposito" id="deposito" />
-                            <Label htmlFor="deposito" className="flex items-center">
-                              <Landmark className="mr-2 h-5 w-5" />
+                            <Label htmlFor="deposito" className="flex items-center font-medium text-gray-800">
+                              <Landmark className="mr-2 h-5 w-5 text-primary" />
                               Depósito Bancário
                             </Label>
                           </div>
@@ -219,6 +220,7 @@ export default function FinancialDonationPage() {
                       <FormControl>
                         <Textarea 
                           placeholder="Deixe uma mensagem para os organizadores da campanha..." 
+                          className="bg-white resize-none min-h-[100px]"
                           {...field} 
                         />
                       </FormControl>
@@ -260,8 +262,8 @@ export default function FinancialDonationPage() {
           </CardHeader>
           
           <CardContent className="space-y-4">
-            <div className="bg-muted p-4 rounded-md">
-              <h3 className="font-medium text-lg mb-2 flex items-center">
+            <div className="bg-gray-100 border border-gray-300 p-4 rounded-md">
+              <h3 className="font-medium text-lg mb-2 flex items-center text-gray-900">
                 {getPaymentMethodIcon(donation.paymentMethod)}
                 <span className="ml-2">
                   {getPaymentMethodName(donation.paymentMethod)}
@@ -272,18 +274,18 @@ export default function FinancialDonationPage() {
                 <div className="space-y-2 text-sm">
                   {donation.paymentMethod === 'pix' && (
                     <>
-                      <p><span className="font-medium">Chave PIX:</span> {donation.accountInfo.pix}</p>
-                      <p className="text-muted-foreground">Faça o pagamento usando a chave PIX acima. O pagamento é processado instantaneamente.</p>
+                      <p><span className="font-semibold text-gray-900">Chave PIX:</span> <span className="text-gray-800">{donation.accountInfo.pix}</span></p>
+                      <p className="text-gray-700 mt-1">Faça o pagamento usando a chave PIX acima. O pagamento é processado instantaneamente.</p>
                     </>
                   )}
                   
                   {(donation.paymentMethod === 'transferencia' || donation.paymentMethod === 'deposito') && (
                     <>
-                      <p><span className="font-medium">Banco:</span> {donation.accountInfo.banco}</p>
-                      <p><span className="font-medium">Agência:</span> {donation.accountInfo.agencia}</p>
-                      <p><span className="font-medium">Conta:</span> {donation.accountInfo.conta}</p>
-                      <p><span className="font-medium">Favorecido:</span> {donation.accountInfo.favorecido}</p>
-                      <p className="text-muted-foreground mt-2">
+                      <p><span className="font-semibold text-gray-900">Banco:</span> <span className="text-gray-800">{donation.accountInfo.banco}</span></p>
+                      <p><span className="font-semibold text-gray-900">Agência:</span> <span className="text-gray-800">{donation.accountInfo.agencia}</span></p>
+                      <p><span className="font-semibold text-gray-900">Conta:</span> <span className="text-gray-800">{donation.accountInfo.conta}</span></p>
+                      <p><span className="font-semibold text-gray-900">Favorecido:</span> <span className="text-gray-800">{donation.accountInfo.favorecido}</span></p>
+                      <p className="text-gray-700 mt-2">
                         {donation.paymentMethod === 'transferencia' 
                           ? "Realize a transferência para a conta acima. Após a transferência, envie o comprovante para o email contato@sousolidario.org.br"
                           : "Realize o depósito na conta acima. Após o depósito, envie o comprovante para o email contato@sousolidario.org.br"}

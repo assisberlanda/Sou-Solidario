@@ -198,13 +198,13 @@ const CampaignItems = ({ campaignId, onItemsSelect }: CampaignItemsProps) => {
               Selecione os itens que deseja doar
             </h3>
             
-            <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg mb-6 flex items-start">
-              <AlertTriangle className="text-amber-500 h-5 w-5 mr-3 flex-shrink-0 mt-0.5" />
+            <div className="p-4 bg-amber-100 border border-amber-300 rounded-lg mb-6 flex items-start">
+              <AlertTriangle className="text-amber-600 h-5 w-5 mr-3 flex-shrink-0 mt-0.5" />
               <div>
-                <p className="text-amber-800 text-sm font-medium mb-1">
+                <p className="text-amber-900 text-sm font-medium mb-1">
                   Itens mais necessários
                 </p>
-                <p className="text-amber-700 text-sm">
+                <p className="text-amber-800 text-sm">
                   Selecione abaixo os itens que você pode doar. Na próxima tela, você poderá informar a quantidade.
                 </p>
               </div>
