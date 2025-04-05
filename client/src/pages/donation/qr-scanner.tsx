@@ -74,20 +74,20 @@ const QrScannerPage = ({ onCampaignSelect }: QrScannerPageProps) => {
             {scannedCode && isProcessing ? (
               <div className="rounded-lg bg-gray-100 p-8 text-center">
                 <div className="animate-pulse flex flex-col items-center">
-                  <QrCode className="h-16 w-16 text-primary mb-4" />
+                  <QrCode className="h-16 w-16 text-[#26c485] mb-4" />
                   <p className="text-lg font-medium text-gray-800">Processando QR Code...</p>
                   <p className="text-sm text-gray-600 mt-2">Redirecionando para a campanha</p>
                 </div>
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-300 rounded-lg">
-                <QrCode className="h-16 w-16 text-gray-400 mb-4" />
+                <QrCode className="h-16 w-16 text-[#26c485] mb-4" />
                 <p className="text-center text-gray-600 mb-4">
                   Clique no botão abaixo para abrir a câmera e escanear um QR code de campanha.
                 </p>
                 <Button
                   onClick={() => setOpenScanner(true)}
-                  className="bg-primary hover:bg-primary-dark flex items-center"
+                  className="btn-hope flex items-center"
                 >
                   <Scan className="mr-2 h-4 w-4" />
                   Abrir Scanner
@@ -107,7 +107,7 @@ const QrScannerPage = ({ onCampaignSelect }: QrScannerPageProps) => {
           <CardContent className="pt-0">
             <div className="space-y-4">
               <div className="flex items-start">
-                <div className="bg-primary text-white rounded-full w-6 h-6 flex items-center justify-center text-xs mr-3 mt-0.5">
+                <div className="bg-[#26c485] text-white rounded-full w-6 h-6 flex items-center justify-center text-xs mr-3 mt-0.5">
                   1
                 </div>
                 <div>
@@ -119,7 +119,7 @@ const QrScannerPage = ({ onCampaignSelect }: QrScannerPageProps) => {
               </div>
 
               <div className="flex items-start">
-                <div className="bg-primary text-white rounded-full w-6 h-6 flex items-center justify-center text-xs mr-3 mt-0.5">
+                <div className="bg-[#26c485] text-white rounded-full w-6 h-6 flex items-center justify-center text-xs mr-3 mt-0.5">
                   2
                 </div>
                 <div>
@@ -131,7 +131,7 @@ const QrScannerPage = ({ onCampaignSelect }: QrScannerPageProps) => {
               </div>
 
               <div className="flex items-start">
-                <div className="bg-primary text-white rounded-full w-6 h-6 flex items-center justify-center text-xs mr-3 mt-0.5">
+                <div className="bg-[#26c485] text-white rounded-full w-6 h-6 flex items-center justify-center text-xs mr-3 mt-0.5">
                   3
                 </div>
                 <div>
@@ -143,7 +143,7 @@ const QrScannerPage = ({ onCampaignSelect }: QrScannerPageProps) => {
               </div>
 
               <div className="flex items-start">
-                <div className="bg-primary text-white rounded-full w-6 h-6 flex items-center justify-center text-xs mr-3 mt-0.5">
+                <div className="bg-[#26c485] text-white rounded-full w-6 h-6 flex items-center justify-center text-xs mr-3 mt-0.5">
                   4
                 </div>
                 <div>
@@ -155,7 +155,7 @@ const QrScannerPage = ({ onCampaignSelect }: QrScannerPageProps) => {
               </div>
             </div>
 
-            <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-100 text-blue-800 text-sm">
+            <div className="mt-6 p-4 bg-green-50 rounded-lg border border-[#26c485]/30 text-[#1b8d5e] text-sm">
               <p className="font-medium mb-1">Dica:</p>
               <p>
                 Certifique-se de que a câmera está focada e que há iluminação suficiente para
