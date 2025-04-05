@@ -316,10 +316,10 @@ const HomePage = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="relative bg-[#1a5f9c] rounded-xl p-8 text-white text-center overflow-hidden">
+      <section className="relative bg-[#64b5f6] rounded-xl p-8 text-white text-center overflow-hidden">
         {/* Background effect */}
-        <div className="absolute inset-0 bg-gradient-to-tr from-[#1a5f9c] to-[#0d4a8b] opacity-80"></div>
-        <div className="absolute inset-0 z-0 opacity-10">
+        <div className="absolute inset-0 bg-gradient-to-tr from-[#64b5f6] to-[#4a98db] opacity-80"></div>
+        <div className="absolute inset-0 z-0 opacity-20">
           <img
             src="/assets/background.jpeg"
             alt="Ajuda humanitária"

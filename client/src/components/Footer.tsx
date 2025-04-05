@@ -18,51 +18,51 @@ const Footer = () => {
           <div>
             <div className="flex items-center mb-4">
               <HandHelping className="text-accent mr-2" size={24} />
-              <h3 className="text-lg font-heading font-bold">Sou Solidário</h3>
+              <h3 className="text-lg font-heading font-bold text-white">Sou Solidário</h3>
             </div>
-            <p className="text-neutral-200 text-sm">
+            <p className="text-white text-sm">
               Plataforma que conecta doadores a pessoas necessitadas em situações de emergência e desastres naturais.
             </p>
           </div>
 
           <div>
-            <h3 className="text-lg font-heading font-bold mb-4">Links Rápidos</h3>
+            <h3 className="text-lg font-heading font-bold mb-4 text-white">Links Rápidos</h3>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link href="/">
-                  <a className="text-neutral-200 hover:text-white transition">Início</a>
+                  <a className="text-white hover:text-white transition">Início</a>
                 </Link>
               </li>
               <li>
                 <Link href="/campanhas">
-                  <a className="text-neutral-200 hover:text-white transition">Campanhas Ativas</a>
+                  <a className="text-white hover:text-white transition">Campanhas Ativas</a>
                 </Link>
               </li>
               <li>
                 <Link href="/doar/campanha">
-                  <a className="text-neutral-200 hover:text-white transition">Como Doar</a>
+                  <a className="text-white hover:text-white transition">Como Doar</a>
                 </Link>
               </li>
               <li>
                 <Link href="/admin">
-                  <a className="text-neutral-200 hover:text-white transition">Área Administrativa</a>
+                  <a className="text-white hover:text-white transition">Área Administrativa</a>
                 </Link>
               </li>
             </ul>
           </div>
 
           <div>
-            <h3 className="text-lg font-heading font-bold mb-4">Contato</h3>
+            <h3 className="text-lg font-heading font-bold mb-4 text-white">Contato</h3>
             <ul className="space-y-2 text-sm">
-              <li className="flex items-center">
+              <li className="flex items-center text-white">
                 <Mail className="w-5 h-5 text-accent mr-2" />
                 <span>contato@sousolidario.org.br</span>
               </li>
-              <li className="flex items-center">
+              <li className="flex items-center text-white">
                 <Phone className="w-5 h-5 text-accent mr-2" />
                 <span>(11) 1234-5678</span>
               </li>
-              <li className="flex items-center">
+              <li className="flex items-center text-white">
                 <MapPin className="w-5 h-5 text-accent mr-2" />
                 <span>São Paulo, SP</span>
               </li>
@@ -70,7 +70,7 @@ const Footer = () => {
           </div>
 
           <div>
-            <h3 className="text-lg font-heading font-bold mb-4">Redes Sociais</h3>
+            <h3 className="text-lg font-heading font-bold mb-4 text-white">Redes Sociais</h3>
             <div className="flex space-x-4">
               <a
                 href="#"
@@ -103,14 +103,14 @@ const Footer = () => {
             </div>
 
             <div className="mt-4">
-              <p className="text-sm text-neutral-200">
+              <p className="text-sm text-white">
                 Inscreva-se para receber atualizações:
               </p>
               <form onSubmit={handleNewsletterSubmit} className="flex mt-2">
                 <Input
                   type="email"
                   placeholder="Seu e-mail"
-                  className="flex-1 rounded-r-none bg-transparent border-white/20 focus-visible:ring-accent"
+                  className="flex-1 rounded-r-none bg-transparent border-white/20 focus-visible:ring-accent text-white"
                   required
                 />
                 <Button
@@ -125,14 +125,14 @@ const Footer = () => {
         </div>
 
         <div className="border-t border-gray-700 mt-8 pt-6 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-sm text-neutral-200">
+          <p className="text-sm text-white">
             © {new Date().getFullYear()} Sou Solidário. Todos os direitos reservados.
           </p>
           <div className="flex space-x-4 mt-4 md:mt-0">
-            <a href="#" className="text-sm text-neutral-200 hover:text-white transition">
+            <a href="#" className="text-sm text-white hover:text-white transition">
               Política de Privacidade
             </a>
-            <a href="#" className="text-sm text-neutral-200 hover:text-white transition">
+            <a href="#" className="text-sm text-white hover:text-white transition">
               Termos de Uso
             </a>
           </div>
