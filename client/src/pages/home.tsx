@@ -316,10 +316,10 @@ const HomePage = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="relative bg-[#64b5f6] rounded-xl p-8 text-white text-center overflow-hidden">
+      <section className="relative bg-[#1a5f9c] rounded-xl p-8 text-white text-center overflow-hidden">
         {/* Background effect */}
-        <div className="absolute inset-0 bg-gradient-to-tr from-[#64b5f6] to-[#4a98db] opacity-80"></div>
-        <div className="absolute inset-0 z-0 opacity-20">
+        <div className="absolute inset-0 bg-gradient-to-tr from-[#1a5f9c] to-[#0d4a8b] opacity-80"></div>
+        <div className="absolute inset-0 z-0 opacity-10">
           <img
             src="/assets/background.jpeg"
             alt="Ajuda humanitária"
@@ -328,14 +328,14 @@ const HomePage = () => {
         </div>
         
         <div className="relative z-10">
-          <h2 className="text-2xl font-heading font-bold mb-4">
+          <h2 className="text-2xl font-heading font-bold mb-4 text-white drop-shadow-md">
             Faça a diferença hoje mesmo!
           </h2>
-          <p className="max-w-2xl mx-auto mb-6">
+          <p className="max-w-2xl mx-auto mb-6 text-white drop-shadow-md">
             Sua doação pode transformar a vida de pessoas afetadas por desastres naturais e emergências.
             Não importa o tamanho da sua contribuição, cada item doado tem um impacto significativo.
           </p>
-          <Link href="/doar/campanha">
+          <Link href="/campanhas">
             <Button className="btn-compassion px-6 py-3 h-auto text-base font-semibold">
               Quero Doar Agora
             </Button>

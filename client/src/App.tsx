@@ -74,7 +74,7 @@ function App() {
           
           {/* Área de Campanhas */}
           <Route path="/campanhas">
-            <PageLayout>
+            <PageLayout showBackButton={false}>
               <CampaignsPage />
             </PageLayout>
           </Route>
