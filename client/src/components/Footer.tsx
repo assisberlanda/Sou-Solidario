@@ -124,13 +124,13 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="border-t border-[#ffb74d]/20 mt-8 pt-6 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-sm text-[#ffcc80]">
+        <div className="border-t border-[#ffb74d]/20 mt-8 pt-6 flex flex-col items-center">
+          <p className="text-sm text-[#ffcc80] text-center mb-4">
             © {new Date().getFullYear()} Sou Solidário. Todos os direitos reservados.
             <br />
-            Desenvolvido por Seu Nome
+            Desenvolvido por Assis Berlanda de Medeiros
           </p>
-          <div className="flex space-x-4 mt-4 md:mt-0">
+          <div className="flex space-x-4">
             <a href="#" className="text-sm text-[#ffcc80] hover:text-[#ffb74d] transition">
               Política de Privacidade
             </a>
