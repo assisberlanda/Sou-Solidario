@@ -15,17 +15,19 @@ const HomePage = () => {
   return (
     <div className="container mx-auto px-4 py-6">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-r from-[#26c485] to-[#1eaa70] text-white rounded-xl p-8 mb-12 overflow-hidden">
-        {/* Fundo com a imagem de ajuda humanitária */}
-        <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-gradient-to-r from-[#26c485]/90 to-[#1eaa70]/90"></div>
-          <img
-            src="@assets/download.jpeg"
-            alt="Ajuda humanitária"
+      <section className="relative rounded-xl mb-12 overflow-hidden">
+        {/* Background Image */}
+        <div className="absolute inset-0">
+          <img 
+            src="/attached_assets/download.jpeg" 
+            alt="Ajuda humanitária" 
             className="w-full h-full object-cover"
           />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-[#1eaa70]/60"></div>
         </div>
-        <div className="relative z-10 max-w-3xl mx-auto text-center">
+        
+        {/* Content */}
+        <div className="relative z-10 max-w-3xl mx-auto text-center p-8 text-white">
           <h1 className="text-3xl md:text-4xl font-heading font-bold mb-4">
             Ajude quem mais precisa em momentos de crise
           </h1>
