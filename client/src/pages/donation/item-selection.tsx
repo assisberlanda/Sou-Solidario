@@ -7,14 +7,15 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import ChatBot from "@/components/ChatBot";
 import { Campaign, NeededItem, Category } from "@shared/schema";
-import { ArrowRight, ArrowLeft, Plus, Minus } from "lucide-react";
+import { ArrowRight, ArrowLeft, Plus, Minus, AlertCircle } from "lucide-react";
 
 interface ItemSelectionProps {
   campaignId: number;
+  selectedItemIds: number[];
   onItemsSelect: (items: { neededItemId: number; quantity: number }[]) => void;
 }
 
-const ItemSelection = ({ campaignId, onItemsSelect }: ItemSelectionProps) => {
+const ItemSelection = ({ campaignId, selectedItemIds, onItemsSelect }: ItemSelectionProps) => {
   const [_, navigate] = useLocation();
   const [selectedItems, setSelectedItems] = useState<
     { neededItemId: number; quantity: number }[]
@@ -29,6 +30,17 @@ const ItemSelection = ({ campaignId, onItemsSelect }: ItemSelectionProps) => {
   const { data: neededItems, isLoading: itemsLoading } = useQuery<NeededItem[]>({
     queryKey: [`/api/campaigns/${campaignId}/items`],
   });
+  
+  // Inicializar os itens selecionados quando os dados chegarem
+  useEffect(() => {
+    if (neededItems && selectedItemIds && selectedItemIds.length > 0) {
+      const initialItems = selectedItemIds.map(id => ({
+        neededItemId: id,
+        quantity: 1
+      }));
+      setSelectedItems(initialItems);
+    }
+  }, [neededItems, selectedItemIds]);
 
   // Buscar categorias
   const { data: categories } = useQuery<Category[]>({
@@ -76,13 +88,14 @@ const ItemSelection = ({ campaignId, onItemsSelect }: ItemSelectionProps) => {
   // Verificar se há algum item selecionado
   const hasSelectedItems = selectedItems.length > 0;
 
-  // Agrupar itens por prioridade
-  const priorityItems = neededItems
-    ? neededItems.filter((item) => item.priority === 1)
+  // Filtrar apenas os itens selecionados
+  const filteredItems = neededItems 
+    ? neededItems.filter((item: NeededItem) => selectedItemIds.includes(item.id))
     : [];
-  const otherItems = neededItems
-    ? neededItems.filter((item) => item.priority !== 1)
-    : [];
+    
+  // Separar itens por prioridade
+  const priorityItems = filteredItems.filter((item: NeededItem) => item.priority === 1);
+  const otherItems = filteredItems.filter((item: NeededItem) => item.priority !== 1);
 
   // Continuar para a próxima etapa
   const handleContinue = () => {
@@ -92,12 +105,14 @@ const ItemSelection = ({ campaignId, onItemsSelect }: ItemSelectionProps) => {
     }
   };
 
-  // Se não tiver campanhaId, redirecionar para seleção de campanha
+  // Se não tiver campanhaId ou itens selecionados, redirecionar
   useEffect(() => {
     if (!campaignId) {
       navigate("/doar/campanha");
+    } else if (!selectedItemIds || selectedItemIds.length === 0) {
+      navigate(`/doar/selecionar-itens`);
     }
-  }, [campaignId, navigate]);
+  }, [campaignId, selectedItemIds, navigate]);
 
   if (campaignLoading || itemsLoading) {
     return (
@@ -166,118 +181,86 @@ const ItemSelection = ({ campaignId, onItemsSelect }: ItemSelectionProps) => {
 
           <div className="mb-6">
             <h3 className="text-xl font-heading font-semibold mb-2">
-              Selecione os itens para doação
+              Defina a quantidade para cada item
             </h3>
             <p className="text-gray-600">
               Campanha: <strong>{campaign.title}</strong>
             </p>
-            <p className="text-sm text-gray-500 mt-1">{campaign.description}</p>
+            <p className="text-sm text-gray-500 mt-1 mb-4">{campaign.description}</p>
+            
+            <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg mb-6 flex items-start">
+              <AlertCircle className="text-amber-500 h-5 w-5 mr-3 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-amber-800 text-sm font-medium mb-1">
+                  Informe a quantidade
+                </p>
+                <p className="text-amber-700 text-sm">
+                  Para cada item selecionado, defina a quantidade que você pretende doar utilizando os botões + e -.
+                </p>
+              </div>
+            </div>
           </div>
 
-          {/* Itens Prioritários */}
-          {priorityItems.length > 0 && (
-            <div className="mb-6">
-              <h4 className="font-medium text-lg mb-3 flex items-center">
-                <Badge className="bg-red-500 mr-2">Prioritário</Badge>
-                Itens de Alta Prioridade
-              </h4>
-              <div className="space-y-3">
-                {priorityItems.map((item) => (
-                  <Card key={item.id} className="border-l-4" style={{ borderLeftColor: getCategoryColor(item.categoryId) }}>
-                    <CardContent className="p-4 flex justify-between items-center">
-                      <div>
-                        <div className="font-medium">{item.name}</div>
-                        <div className="text-sm text-gray-500">
-                          Necessários: {item.quantity} {item.unit}
-                        </div>
+          {/* Lista de itens selecionados com controles de quantidade */}
+          <div className="space-y-3 mb-6">
+            {filteredItems.length === 0 ? (
+              <p className="text-center text-gray-500 py-4">
+                Nenhum item selecionado. Volte para selecionar itens.
+              </p>
+            ) : (
+              filteredItems.map((item: NeededItem) => (
+                <Card 
+                  key={item.id} 
+                  className={`border-l-4 ${item.priority === 1 ? 'bg-red-50' : ''}`}
+                  style={{ borderLeftColor: getCategoryColor(item.categoryId) }}
+                >
+                  <CardContent className="p-4 flex justify-between items-center">
+                    <div>
+                      <div className="font-medium flex items-center">
+                        {item.name}
+                        {item.priority === 1 && (
+                          <Badge className="bg-red-500 ml-2 text-xs">Prioritário</Badge>
+                        )}
                       </div>
-                      <div className="flex items-center space-x-3">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() =>
-                            updateItemQuantity(item.id, Math.max(0, getItemQuantity(item.id) - 1))
-                          }
-                          disabled={getItemQuantity(item.id) === 0}
-                        >
-                          <Minus className="h-3 w-3" />
-                        </Button>
-                        <Input
-                          type="number"
-                          className="w-16 text-center"
-                          value={getItemQuantity(item.id)}
-                          onChange={(e) =>
-                            updateItemQuantity(item.id, parseInt(e.target.value) || 0)
-                          }
-                          min="0"
-                        />
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() =>
-                            updateItemQuantity(item.id, getItemQuantity(item.id) + 1)
-                          }
-                        >
-                          <Plus className="h-3 w-3" />
-                        </Button>
+                      <div className="text-sm text-gray-500">
+                        Necessários: {item.quantity} {item.unit}
                       </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Outros Itens */}
-          {otherItems.length > 0 && (
-            <div className="mb-6">
-              <h4 className="font-medium text-lg mb-3">Outros Itens Necessários</h4>
-              <div className="space-y-3">
-                {otherItems.map((item) => (
-                  <Card key={item.id} className="border-l-4" style={{ borderLeftColor: getCategoryColor(item.categoryId) }}>
-                    <CardContent className="p-4 flex justify-between items-center">
-                      <div>
-                        <div className="font-medium">{item.name}</div>
-                        <div className="text-sm text-gray-500">
-                          Necessários: {item.quantity} {item.unit}
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-3">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() =>
-                            updateItemQuantity(item.id, Math.max(0, getItemQuantity(item.id) - 1))
-                          }
-                          disabled={getItemQuantity(item.id) === 0}
-                        >
-                          <Minus className="h-3 w-3" />
-                        </Button>
-                        <Input
-                          type="number"
-                          className="w-16 text-center"
-                          value={getItemQuantity(item.id)}
-                          onChange={(e) =>
-                            updateItemQuantity(item.id, parseInt(e.target.value) || 0)
-                          }
-                          min="0"
-                        />
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() =>
-                            updateItemQuantity(item.id, getItemQuantity(item.id) + 1)
-                          }
-                        >
-                          <Plus className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </div>
-          )}
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          updateItemQuantity(item.id, Math.max(0, getItemQuantity(item.id) - 1))
+                        }
+                        disabled={getItemQuantity(item.id) === 0}
+                      >
+                        <Minus className="h-3 w-3" />
+                      </Button>
+                      <Input
+                        type="number"
+                        className="w-16 text-center"
+                        value={getItemQuantity(item.id)}
+                        onChange={(e) =>
+                          updateItemQuantity(item.id, parseInt(e.target.value) || 0)
+                        }
+                        min="0"
+                      />
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          updateItemQuantity(item.id, getItemQuantity(item.id) + 1)
+                        }
+                      >
+                        <Plus className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            )}
+          </div>
 
           {/* Resumo da seleção */}
           {hasSelectedItems && (

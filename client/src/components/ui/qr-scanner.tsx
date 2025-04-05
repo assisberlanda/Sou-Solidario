@@ -47,7 +47,7 @@ const QRCodeScanner = ({ open, onClose, onScan }: QRScannerProps) => {
     }
   };
 
-  const handleError = (err: Error) => {
+  const handleError = (err: unknown) => {
     console.error("Erro ao escanear QR code:", err);
     setError("Erro ao escanear QR code. Por favor, tente novamente.");
   };

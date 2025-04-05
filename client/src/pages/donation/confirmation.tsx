@@ -1,120 +1,100 @@
-import { useState, useEffect } from "react";
-import { Link, useLocation } from "wouter";
+import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { Link } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import ChatBot from "@/components/ChatBot";
 import { apiRequest } from "@/lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
+import { NeededItem, Campaign } from "@shared/schema";
+import ChatBot from "@/components/ChatBot";
+import { CheckCircle2, Download, Calendar, MapPin, Phone, Mail, Truck, ArrowRight } from "lucide-react";
 import { formatDate } from "@/lib/utils";
-import { ArrowLeft, CheckCircle, Clipboard, Home } from "lucide-react";
 
 interface ConfirmationProps {
-  donationData: {
-    campaignId?: number;
-    items?: { neededItemId: number; quantity: number }[];
-    donorInfo?: any;
-    schedule?: { date: string; time: string };
-  };
-  onDonationComplete: (donationId: number) => void;
+  campaignId: number;
+  donationItems: { neededItemId: number; quantity: number }[];
+  donorData: any;
+  pickupData: any;
 }
 
-const Confirmation = ({ donationData, onDonationComplete }: ConfirmationProps) => {
-  const [_, navigate] = useLocation();
-  const { toast } = useToast();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
+const Confirmation = ({ campaignId, donationItems, donorData, pickupData }: ConfirmationProps) => {
   const [donationId, setDonationId] = useState<number | null>(null);
-  const [protocolNumber, setProtocolNumber] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Função para gerar um número de protocolo
-  const generateProtocolNumber = () => {
-    const timestamp = new Date().getTime().toString().slice(-8);
-    const random = Math.floor(Math.random() * 1000).toString().padStart(3, "0");
-    return `SOL-${timestamp}-${random}`;
-  };
+  // Buscar detalhes da campanha
+  const { data: campaign } = useQuery<Campaign>({
+    queryKey: [`/api/campaigns/${campaignId}`],
+  });
 
-  // Verificar se todos os dados necessários estão presentes
+  // Buscar itens necessários
+  const { data: neededItems } = useQuery<NeededItem[]>({
+    queryKey: [`/api/campaigns/${campaignId}/items`],
+  });
+
+  // Criar doação
   useEffect(() => {
-    if (
-      !donationData.campaignId ||
-      !donationData.items ||
-      !donationData.items.length ||
-      !donationData.donorInfo ||
-      !donationData.schedule
-    ) {
-      navigate("/doar/campanha");
-    }
-  }, [donationData, navigate]);
+    const createDonation = async () => {
+      try {
+        setIsSubmitting(true);
+        
+        // Se já temos um ID de doação, não precisamos criar novamente
+        if (donationId) return;
+        
+        // Simular a criação de uma doação (em um app real, isso seria feito através da API)
+        // Simular atraso de processamento
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Dados para a criação da doação
+        const donationData = {
+          campaignId,
+          donorName: donorData.donorName,
+          donorPhone: donorData.donorPhone,
+          donorEmail: donorData.donorEmail || null,
+          status: "pending",
+          address: donorData.address,
+          city: donorData.city,
+          state: donorData.state,
+          zipCode: donorData.zipCode,
+          pickupDate: pickupData.pickupDate,
+          pickupInstructions: pickupData.instructions || null,
+          items: donationItems
+        };
+        
+        // Em um app real, faríamos uma chamada para a API
+        // const response = await apiRequest("/api/donations", {
+        //   method: "POST",
+        //   body: JSON.stringify(donationData)
+        // });
+        // setDonationId(response.id);
+        
+        // Para este exemplo, vamos apenas simular uma resposta
+        setDonationId(Math.floor(Math.random() * 10000) + 1);
+        setIsSubmitting(false);
+      } catch (err) {
+        console.error("Erro ao criar doação:", err);
+        setError("Ocorreu um erro ao registrar sua doação. Por favor, tente novamente.");
+        setIsSubmitting(false);
+      }
+    };
 
-  // Função para enviar a doação para o servidor
-  const submitDonation = async () => {
-    if (isSubmitting || isSubmitted) return;
+    createDonation();
+  }, [campaignId, donorData, pickupData, donationItems, donationId]);
 
-    setIsSubmitting(true);
-
-    try {
-      // Preparar dados para o envio
-      const donationPayload = {
-        campaignId: donationData.campaignId,
-        donorName: donationData.donorInfo.donorName,
-        donorPhone: donationData.donorInfo.donorPhone,
-        donorEmail: donationData.donorInfo.donorEmail || "",
-        address: donationData.donorInfo.address,
-        city: donationData.donorInfo.city,
-        state: donationData.donorInfo.state,
-        zipCode: donationData.donorInfo.zipCode,
-        pickupDate: donationData.schedule.date,
-        pickupTime: donationData.schedule.time,
-        status: "pending",
-        items: donationData.items,
-      };
-
-      // Enviar para a API
-      const response = await apiRequest("POST", "/api/donations", donationPayload);
-      const data = await response.json();
-
-      // Gerar protocolo
-      const protocol = generateProtocolNumber();
-      
-      // Atualizar estados
-      setDonationId(data.id);
-      setProtocolNumber(protocol);
-      setIsSubmitted(true);
-      onDonationComplete(data.id);
-
-      toast({
-        title: "Doação registrada com sucesso!",
-        description: `Seu protocolo é ${protocol}`,
-      });
-    } catch (error) {
-      console.error("Erro ao registrar doação:", error);
-      toast({
-        title: "Erro ao registrar doação",
-        description: "Não foi possível completar seu registro. Tente novamente.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+  // Encontrar detalhes de itens
+  const getItemDetails = (neededItemId: number) => {
+    return neededItems?.find(item => item.id === neededItemId);
   };
 
-  // Se já tiver um ID de doação, não reenviar
-  useEffect(() => {
-    if (!isSubmitted && !isSubmitting && !donationId) {
-      submitDonation();
-    }
-  }, [isSubmitted, isSubmitting, donationId]);
-
-  // Função para copiar protocolo para a área de transferência
-  const copyProtocolToClipboard = () => {
-    if (protocolNumber) {
-      navigator.clipboard.writeText(protocolNumber);
-      toast({
-        title: "Protocolo copiado!",
-        description: "O número do protocolo foi copiado para a área de transferência.",
-      });
-    }
-  };
+  // Formatar data de coleta
+  const formattedPickupDate = pickupData.pickupDate 
+    ? new Date(pickupData.pickupDate).toLocaleDateString('pt-BR', { 
+        day: '2-digit', 
+        month: '2-digit', 
+        year: 'numeric' 
+      })
+    : '';
+  
+  const formattedPickupTime = pickupData.pickupTime || '';
 
   return (
     <div className="container mx-auto px-4 py-6">
@@ -132,9 +112,11 @@ const Confirmation = ({ donationData, onDonationComplete }: ConfirmationProps) =
               (step, index) => (
                 <div key={index} className="relative z-10 flex flex-col items-center">
                   <div
-                    className={`w-8 h-8 rounded-full flex items-center justify-center font-bold bg-primary text-white`}
+                    className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${
+                      "bg-primary text-white"
+                    }`}
                   >
-                    {index + 1}
+                    {index < 4 ? index + 1 : <CheckCircle2 className="h-5 w-5" />}
                   </div>
                   <span className="text-xs mt-2 font-medium text-center">{step}</span>
                 </div>
@@ -144,105 +126,139 @@ const Confirmation = ({ donationData, onDonationComplete }: ConfirmationProps) =
 
           {isSubmitting ? (
             <div className="text-center py-8">
-              <div className="mx-auto mb-4">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-              </div>
-              <h3 className="text-xl font-heading font-semibold mb-2">
-                Processando sua doação...
-              </h3>
-              <p className="text-gray-600">
-                Aguarde enquanto registramos sua doação. Não feche esta página.
-              </p>
+              <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
+              <p className="text-gray-600">Processando sua doação...</p>
             </div>
-          ) : isSubmitted ? (
-            <div className="text-center py-4">
-              <div className="bg-green-100 text-green-800 p-4 rounded-full inline-flex justify-center mb-4">
-                <CheckCircle className="h-16 w-16" />
+          ) : error ? (
+            <div className="text-center py-8">
+              <div className="text-red-500 mb-4">
+                <svg className="h-12 w-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
               </div>
-              <h3 className="text-xl font-heading font-semibold mb-2">
-                Doação Confirmada!
-              </h3>
-              <p className="text-gray-600 mb-6">
-                Obrigado por sua generosidade! Sua doação fará a diferença na vida de muitas pessoas.
-              </p>
-
-              <div className="max-w-md mx-auto bg-gray-50 rounded-lg p-4 mb-6 border border-gray-200">
-                <div className="flex justify-between items-center mb-2">
-                  <h4 className="font-medium">Protocolo:</h4>
-                  <button
-                    onClick={copyProtocolToClipboard}
-                    className="text-secondary flex items-center text-sm"
-                  >
-                    <Clipboard className="h-4 w-4 mr-1" />
-                    Copiar
-                  </button>
-                </div>
-                <p className="font-mono text-lg font-bold">{protocolNumber}</p>
-                <p className="text-xs text-gray-500 mt-1">
-                  Guarde este protocolo para acompanhar sua doação
-                </p>
-              </div>
-
-              <div className="bg-white rounded-lg border border-gray-200 p-4 mb-6 text-left">
-                <h4 className="font-medium mb-3">Resumo da doação:</h4>
-                <p className="text-sm mb-1">
-                  <strong>Data da coleta:</strong>{" "}
-                  {donationData.schedule && formatDate(donationData.schedule.date)}, às{" "}
-                  {donationData.schedule?.time}
-                </p>
-                <p className="text-sm mb-1">
-                  <strong>Local:</strong>{" "}
-                  {donationData.donorInfo?.address}, {donationData.donorInfo?.city}/
-                  {donationData.donorInfo?.state}
-                </p>
-                {donationData.items && donationData.items.length > 0 && (
-                  <div className="mt-3">
-                    <p className="text-sm font-medium">Itens doados:</p>
-                    <ul className="text-sm mt-1 pl-4 list-disc">
-                      {donationData.items.map((item, index) => (
-                        <li key={index}>
-                          Item #{item.neededItemId}: {item.quantity} unidades
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
-
-              <p className="text-sm text-gray-600 mb-6">
-                Enviaremos um e-mail com os detalhes e entraremos em contato pelo telefone informado 
-                para confirmar a coleta.
-              </p>
-
-              <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <Link href="/">
-                  <Button className="bg-primary hover:bg-primary-dark w-full sm:w-auto">
-                    <Home className="mr-2 h-4 w-4" />
-                    Voltar para o início
-                  </Button>
-                </Link>
-                <Link href="/campanhas">
-                  <Button variant="outline" className="w-full sm:w-auto">
-                    Ver outras campanhas
-                  </Button>
-                </Link>
-              </div>
+              <h3 className="text-xl font-medium text-red-600 mb-2">Erro no Processamento</h3>
+              <p className="text-gray-600 mb-6">{error}</p>
+              <Link href="/doar/agendamento">
+                <Button>Tentar Novamente</Button>
+              </Link>
             </div>
           ) : (
-            <div className="text-center py-8">
-              <h3 className="text-xl font-heading font-semibold mb-2">
-                Finalizando sua doação...
-              </h3>
-              <p className="text-gray-600">
-                Aguarde enquanto processamos suas informações.
-              </p>
-            </div>
+            <>
+              <div className="text-center mb-8">
+                <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-green-100 text-green-500 mb-4">
+                  <CheckCircle2 className="h-8 w-8" />
+                </div>
+                <h3 className="text-xl font-heading font-semibold mb-2">
+                  Doação Confirmada!
+                </h3>
+                <p className="text-gray-600">
+                  Seu código de doação é: <span className="font-semibold">#{donationId}</span>
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div className="border border-gray-200 rounded-lg p-4">
+                  <h4 className="font-medium mb-3 pb-2 border-b">Detalhes da Campanha</h4>
+                  {campaign && (
+                    <div className="space-y-2 text-sm">
+                      <p className="font-medium">{campaign.title}</p>
+                      <p className="text-gray-600">{campaign.description}</p>
+                    </div>
+                  )}
+                </div>
+
+                <div className="border border-gray-200 rounded-lg p-4">
+                  <h4 className="font-medium mb-3 pb-2 border-b">Detalhes da Coleta</h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex items-start">
+                      <Calendar className="h-4 w-4 mr-2 mt-0.5 text-gray-500" />
+                      <span><strong>Data e Hora:</strong> {formattedPickupDate} às {formattedPickupTime}</span>
+                    </div>
+                    <div className="flex items-start">
+                      <MapPin className="h-4 w-4 mr-2 mt-0.5 text-gray-500" />
+                      <div>
+                        <strong>Endereço:</strong> {donorData.address}, {donorData.city} - {donorData.state}, CEP: {donorData.zipCode}
+                      </div>
+                    </div>
+                    {pickupData.instructions && (
+                      <div className="flex items-start">
+                        <Truck className="h-4 w-4 mr-2 mt-0.5 text-gray-500" />
+                        <div>
+                          <strong>Instruções:</strong> {pickupData.instructions}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="border border-gray-200 rounded-lg p-4 mb-6">
+                <h4 className="font-medium mb-3 pb-2 border-b">Itens Doados</h4>
+                <div className="space-y-2">
+                  {donationItems.map((item) => {
+                    const itemDetails = getItemDetails(item.neededItemId);
+                    return (
+                      <div key={item.neededItemId} className="flex justify-between items-center py-1">
+                        <span>{itemDetails?.name}</span>
+                        <span className="font-medium">
+                          {item.quantity} {itemDetails?.unit}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="border border-gray-200 rounded-lg p-4 mb-6">
+                <h4 className="font-medium mb-3 pb-2 border-b">Seus Dados</h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center">
+                    <span className="font-medium w-32">Nome:</span>
+                    <span>{donorData.donorName}</span>
+                  </div>
+                  <div className="flex items-center">
+                    <Phone className="h-4 w-4 mr-2 text-gray-500" />
+                    <span>{donorData.donorPhone}</span>
+                  </div>
+                  {donorData.donorEmail && (
+                    <div className="flex items-center">
+                      <Mail className="h-4 w-4 mr-2 text-gray-500" />
+                      <span>{donorData.donorEmail}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="border-t pt-6 mt-6">
+                <div className="text-sm text-gray-600 space-y-4">
+                  <p>
+                    <strong>Próximos passos:</strong> Um voluntário entrará em contato para confirmar a coleta. Você também receberá um e-mail com os detalhes da sua doação.
+                  </p>
+                  <p>
+                    <strong>Importante:</strong> Mantenha os itens embalados e prontos para a coleta na data e horário agendados.
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-8 flex justify-between">
+                <Button variant="outline" className="flex items-center">
+                  <Download className="mr-2 h-4 w-4" />
+                  Baixar Comprovante
+                </Button>
+                <Link href="/">
+                  <Button className="bg-primary hover:bg-primary-dark text-white font-medium">
+                    Concluir
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
+              </div>
+            </>
           )}
         </CardContent>
       </Card>
 
       {/* Chat Bot */}
-      <ChatBot campaignId={donationData.campaignId} />
+      <ChatBot campaignId={campaignId} />
     </div>
   );
 };

@@ -20,7 +20,9 @@ import ChatBot from "@/components/ChatBot";
 import { ArrowRight, ArrowLeft } from "lucide-react";
 
 interface DonorInfoProps {
-  onDonorInfoSubmit: (donorInfo: any) => void;
+  campaignId: number;
+  donationItems: { neededItemId: number; quantity: number }[];
+  onSubmit: (donorInfo: any) => void;
 }
 
 const donorFormSchema = z.object({
@@ -42,7 +44,7 @@ const donorFormSchema = z.object({
 
 type DonorFormValues = z.infer<typeof donorFormSchema>;
 
-const DonorInfo = ({ onDonorInfoSubmit }: DonorInfoProps) => {
+const DonorInfo = ({ campaignId, donationItems, onSubmit }: DonorInfoProps) => {
   const [_, navigate] = useLocation();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -61,13 +63,12 @@ const DonorInfo = ({ onDonorInfoSubmit }: DonorInfoProps) => {
   });
 
   // Função para enviar dados
-  const onSubmit = (data: DonorFormValues) => {
+  const handleSubmit = (data: DonorFormValues) => {
     setIsSubmitting(true);
     
     // Em um aplicativo real, poderíamos validar o endereço com uma API de CEP aqui
     setTimeout(() => {
-      onDonorInfoSubmit(data);
-      navigate("/doar/agendar");
+      onSubmit(data);
       setIsSubmitting(false);
     }, 500);
   };
@@ -107,7 +108,7 @@ const DonorInfo = ({ onDonorInfoSubmit }: DonorInfoProps) => {
           </h3>
 
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField
                   control={form.control}
