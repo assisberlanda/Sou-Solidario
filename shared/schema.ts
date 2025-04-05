@@ -131,7 +131,7 @@ export const financialDonationProcessSchema = z.object({
   donorEmail: z.string().email({ message: "Email inválido" }),
   donorPhone: z.string().min(10, { message: "Telefone é obrigatório" }),
   amount: z.number().min(1, { message: "Valor deve ser maior que zero" }),
-  paymentMethod: z.enum(["pix", "transferencia", "deposito"], { 
+  paymentMethod: z.enum(["pix", "cartao", "deposito"], { 
     errorMap: () => ({ message: "Selecione um método de pagamento válido" }) 
   }),
   message: z.string().optional(),

@@ -27,7 +27,7 @@ export default function FinancialDonationPage() {
   const [donation, setDonation] = useState<any>(null);
   const [_, navigate] = useLocation();
   const { toast } = useToast();
-  
+
   const form = useForm<FinancialDonationForm>({
     resolver: zodResolver(financialDonationProcessSchema),
     defaultValues: {
@@ -40,13 +40,13 @@ export default function FinancialDonationPage() {
       message: ""
     }
   });
-  
+
   const onSubmit = async (data: FinancialDonationForm) => {
     setLoading(true);
     try {
       const response = await apiRequest("POST", "/api/financial-donations", data);
       const donationData = await response.json();
-      
+
       setDonation(donationData);
       setStep(2);
       toast({
@@ -64,12 +64,12 @@ export default function FinancialDonationPage() {
       setLoading(false);
     }
   };
-  
+
   const getPaymentMethodIcon = (method: string) => {
     switch (method) {
       case 'pix':
         return <QrCode className="h-6 w-6" />;
-      case 'transferencia':
+      case 'cartao':
         return <CreditCard className="h-6 w-6" />;
       case 'deposito':
         return <Landmark className="h-6 w-6" />;
@@ -77,24 +77,24 @@ export default function FinancialDonationPage() {
         return <Wallet className="h-6 w-6" />;
     }
   };
-  
+
   const getPaymentMethodName = (method: string) => {
     switch (method) {
       case 'pix':
         return 'PIX';
-      case 'transferencia':
-        return 'Transferência Bancária';
+      case 'cartao':
+        return 'Cartão de Crédito';
       case 'deposito':
         return 'Depósito Bancário';
       default:
         return method;
     }
   };
-  
+
   return (
     <div className="container mx-auto py-8 px-4">
       <h1 className="text-2xl font-heading font-bold mb-6">Faça uma Doação Financeira</h1>
-      
+
       {step === 1 && (
         <Card className="max-w-2xl mx-auto">
           <CardHeader>
@@ -103,7 +103,7 @@ export default function FinancialDonationPage() {
               Preencha os dados abaixo para realizar sua doação financeira.
             </CardDescription>
           </CardHeader>
-          
+
           <CardContent>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -120,7 +120,7 @@ export default function FinancialDonationPage() {
                     </FormItem>
                   )}
                 />
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
@@ -135,7 +135,7 @@ export default function FinancialDonationPage() {
                       </FormItem>
                     )}
                   />
-                  
+
                   <FormField
                     control={form.control}
                     name="donorPhone"
@@ -150,7 +150,7 @@ export default function FinancialDonationPage() {
                     )}
                   />
                 </div>
-                
+
                 <FormField
                   control={form.control}
                   name="amount"
@@ -171,7 +171,7 @@ export default function FinancialDonationPage() {
                     </FormItem>
                   )}
                 />
-                
+
                 <FormField
                   control={form.control}
                   name="paymentMethod"
@@ -192,10 +192,10 @@ export default function FinancialDonationPage() {
                             </Label>
                           </div>
                           <div className="flex items-center space-x-2 rounded-md border border-gray-300 p-3 hover:bg-gray-50 bg-white">
-                            <RadioGroupItem value="transferencia" id="transferencia" />
-                            <Label htmlFor="transferencia" className="flex items-center font-medium text-gray-800">
+                            <RadioGroupItem value="cartao" id="cartao" />
+                            <Label htmlFor="cartao" className="flex items-center font-medium text-gray-800">
                               <CreditCard className="mr-2 h-5 w-5 text-primary" />
-                              Transferência Bancária
+                              Cartão de Crédito
                             </Label>
                           </div>
                           <div className="flex items-center space-x-2 rounded-md border border-gray-300 p-3 hover:bg-gray-50 bg-white">
@@ -211,7 +211,39 @@ export default function FinancialDonationPage() {
                     </FormItem>
                   )}
                 />
-                
+
+                {form.watch("paymentMethod") === "cartao" && (
+                  <div className="space-y-4 border border-gray-200 rounded-md p-4 bg-gray-50">
+                    <h4 className="font-medium">Dados do Cartão</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormItem>
+                        <FormLabel>Número do Cartão</FormLabel>
+                        <FormControl>
+                          <Input placeholder="0000 0000 0000 0000" className="bg-white" />
+                        </FormControl>
+                      </FormItem>
+                      <FormItem>
+                        <FormLabel>Nome no Cartão</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Nome como está no cartão" className="bg-white" />
+                        </FormControl>
+                      </FormItem>
+                      <FormItem>
+                        <FormLabel>Data de Validade</FormLabel>
+                        <FormControl>
+                          <Input placeholder="MM/AA" className="bg-white" />
+                        </FormControl>
+                      </FormItem>
+                      <FormItem>
+                        <FormLabel>CVV</FormLabel>
+                        <FormControl>
+                          <Input type="password" maxLength={4} placeholder="123" className="bg-white" />
+                        </FormControl>
+                      </FormItem>
+                    </div>
+                  </div>
+                )}
+
                 <FormField
                   control={form.control}
                   name="message"
@@ -229,7 +261,7 @@ export default function FinancialDonationPage() {
                     </FormItem>
                   )}
                 />
-                
+
                 <div className="flex justify-between pt-4">
                   <Button
                     type="button"
@@ -249,7 +281,7 @@ export default function FinancialDonationPage() {
           </CardContent>
         </Card>
       )}
-      
+
       {step === 2 && donation && (
         <Card className="max-w-2xl mx-auto">
           <CardHeader className="text-center pb-2">
@@ -261,7 +293,7 @@ export default function FinancialDonationPage() {
               Obrigado por sua contribuição de {formatCurrency(donation.amount)}
             </CardDescription>
           </CardHeader>
-          
+
           <CardContent className="space-y-4">
             <div className="bg-gray-100 border border-gray-300 p-4 rounded-md">
               <h3 className="font-medium text-lg mb-2 flex items-center text-gray-900">
@@ -270,7 +302,7 @@ export default function FinancialDonationPage() {
                   {getPaymentMethodName(donation.paymentMethod)}
                 </span>
               </h3>
-              
+
               {donation.accountInfo && (
                 <div className="space-y-2 text-sm">
                   {donation.paymentMethod === 'pix' && (
@@ -279,16 +311,16 @@ export default function FinancialDonationPage() {
                       <p className="text-gray-700 mt-1">Faça o pagamento usando a chave PIX acima. O pagamento é processado instantaneamente.</p>
                     </>
                   )}
-                  
-                  {(donation.paymentMethod === 'transferencia' || donation.paymentMethod === 'deposito') && (
+
+                  {(donation.paymentMethod === 'cartao' || donation.paymentMethod === 'deposito') && (
                     <>
                       <p><span className="font-semibold text-gray-900">Banco:</span> <span className="text-gray-800">{donation.accountInfo.banco}</span></p>
                       <p><span className="font-semibold text-gray-900">Agência:</span> <span className="text-gray-800">{donation.accountInfo.agencia}</span></p>
                       <p><span className="font-semibold text-gray-900">Conta:</span> <span className="text-gray-800">{donation.accountInfo.conta}</span></p>
                       <p><span className="font-semibold text-gray-900">Favorecido:</span> <span className="text-gray-800">{donation.accountInfo.favorecido}</span></p>
                       <p className="text-gray-700 mt-2">
-                        {donation.paymentMethod === 'transferencia' 
-                          ? "Realize a transferência para a conta acima. Após a transferência, envie o comprovante para o email contato@sousolidario.org.br"
+                        {donation.paymentMethod === 'cartao' 
+                          ? "Pagamento processado via cartão de crédito."
                           : "Realize o depósito na conta acima. Após o depósito, envie o comprovante para o email contato@sousolidario.org.br"}
                       </p>
                     </>
@@ -296,7 +328,7 @@ export default function FinancialDonationPage() {
                 </div>
               )}
             </div>
-            
+
             <div>
               <h3 className="font-medium text-lg mb-2">Informações da Doação</h3>
               <div className="space-y-1 text-sm">
@@ -307,7 +339,7 @@ export default function FinancialDonationPage() {
               </div>
             </div>
           </CardContent>
-          
+
           <CardFooter className="justify-between">
             <Button
               variant="outline"
