@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 // Componentes
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import PageLayout from "@/components/PageLayout";
 
 // Páginas
 import Home from "@/pages/home";
@@ -64,95 +65,115 @@ function App() {
       <main className="flex-grow mt-16">
         <Switch>
           {/* Página Inicial */}
-          <Route path="/" component={Home} />
+          <Route path="/">
+            <PageLayout showBackButton={false}>
+              <Home />
+            </PageLayout>
+          </Route>
           
           {/* Área de Campanhas */}
           <Route path="/campanhas">
-            <CampaignsPage />
+            <PageLayout>
+              <CampaignsPage />
+            </PageLayout>
           </Route>
           
           {/* Fluxo de Doação */}
           <Route path="/doar">
-            <DonationProcess />
+            <PageLayout>
+              <DonationProcess />
+            </PageLayout>
           </Route>
           
           <Route path="/doar/campanha">
-            <CampaignSelection 
-              onCampaignSelect={(campaignId) => 
-                setDonationState({ ...donationState, campaignId })
-              } 
-            />
+            <PageLayout>
+              <CampaignSelection 
+                onCampaignSelect={(campaignId) => 
+                  setDonationState({ ...donationState, campaignId })
+                } 
+              />
+            </PageLayout>
           </Route>
           
           <Route path="/doar/itens">
-            {donationState.campaignId ? (
-              <ItemSelection 
-                campaignId={donationState.campaignId} 
-                onItemsSelect={(items) => 
-                  setDonationState({ ...donationState, items })
-                }
-              />
-            ) : (
-              <CampaignSelection 
-                onCampaignSelect={(campaignId) => 
-                  setDonationState({ ...donationState, campaignId })
-                }
-              />
-            )}
+            <PageLayout>
+              {donationState.campaignId ? (
+                <ItemSelection 
+                  campaignId={donationState.campaignId} 
+                  onItemsSelect={(items) => 
+                    setDonationState({ ...donationState, items })
+                  }
+                />
+              ) : (
+                <CampaignSelection 
+                  onCampaignSelect={(campaignId) => 
+                    setDonationState({ ...donationState, campaignId })
+                  }
+                />
+              )}
+            </PageLayout>
           </Route>
           
           <Route path="/doar/dados">
-            {donationState.campaignId && donationState.items ? (
-              <DonorInfo 
-                onDonorInfoSubmit={(donorInfo) => 
-                  setDonationState({ ...donationState, donorInfo })
-                }
-              />
-            ) : (
-              <CampaignSelection 
-                onCampaignSelect={(campaignId) => 
-                  setDonationState({ ...donationState, campaignId })
-                }
-              />
-            )}
+            <PageLayout>
+              {donationState.campaignId && donationState.items ? (
+                <DonorInfo 
+                  onDonorInfoSubmit={(donorInfo) => 
+                    setDonationState({ ...donationState, donorInfo })
+                  }
+                />
+              ) : (
+                <CampaignSelection 
+                  onCampaignSelect={(campaignId) => 
+                    setDonationState({ ...donationState, campaignId })
+                  }
+                />
+              )}
+            </PageLayout>
           </Route>
           
           <Route path="/doar/agendar">
-            {donationState.campaignId && donationState.items && donationState.donorInfo ? (
-              <Schedule 
-                onScheduleSubmit={(schedule) => 
-                  setDonationState({ ...donationState, schedule })
-                }
-              />
-            ) : (
-              <CampaignSelection 
-                onCampaignSelect={(campaignId) => 
-                  setDonationState({ ...donationState, campaignId })
-                }
-              />
-            )}
+            <PageLayout>
+              {donationState.campaignId && donationState.items && donationState.donorInfo ? (
+                <Schedule 
+                  onScheduleSubmit={(schedule) => 
+                    setDonationState({ ...donationState, schedule })
+                  }
+                />
+              ) : (
+                <CampaignSelection 
+                  onCampaignSelect={(campaignId) => 
+                    setDonationState({ ...donationState, campaignId })
+                  }
+                />
+              )}
+            </PageLayout>
           </Route>
           
           <Route path="/doar/confirmacao">
-            {donationState.campaignId && donationState.items && donationState.donorInfo && donationState.schedule ? (
-              <Confirmation 
-                donationData={donationState} 
-                onDonationComplete={(donationId) => 
-                  setDonationState({ ...donationState, donationId })
-                }
-              />
-            ) : (
-              <CampaignSelection 
-                onCampaignSelect={(campaignId) => 
-                  setDonationState({ ...donationState, campaignId })
-                }
-              />
-            )}
+            <PageLayout>
+              {donationState.campaignId && donationState.items && donationState.donorInfo && donationState.schedule ? (
+                <Confirmation 
+                  donationData={donationState} 
+                  onDonationComplete={(donationId) => 
+                    setDonationState({ ...donationState, donationId })
+                  }
+                />
+              ) : (
+                <CampaignSelection 
+                  onCampaignSelect={(campaignId) => 
+                    setDonationState({ ...donationState, campaignId })
+                  }
+                />
+              )}
+            </PageLayout>
           </Route>
           
           <Route path="/doacao-financeira/:id">
             {(params) => (
-              <FinancialDonationPage />
+              <PageLayout>
+                <FinancialDonationPage />
+              </PageLayout>
             )}
           </Route>
           
@@ -163,12 +184,14 @@ function App() {
                 return <NotFound />;
               }
               return (
-                <CampaignItems 
-                  campaignId={id} 
-                  onItemsSelect={(selectedItemIds) => 
-                    navigate(`/doar/items/${id}`) 
-                  }
-                />
+                <PageLayout>
+                  <CampaignItems 
+                    campaignId={id} 
+                    onItemsSelect={(selectedItemIds) => 
+                      navigate(`/doar/items/${id}`) 
+                    }
+                  />
+                </PageLayout>
               );
             }}
           </Route>
@@ -180,43 +203,66 @@ function App() {
                 return <NotFound />;
               }
               return (
-                <ItemSelection 
-                  campaignId={id} 
-                  onItemsSelect={(items) => 
-                    setDonationState({ ...donationState, campaignId: id, items })
-                  }
-                />
+                <PageLayout>
+                  <ItemSelection 
+                    campaignId={id} 
+                    onItemsSelect={(items) => 
+                      setDonationState({ ...donationState, campaignId: id, items })
+                    }
+                  />
+                </PageLayout>
               );
             }}
           </Route>
           
           <Route path="/qrcode">
-            <QrScannerPage onCampaignSelect={(campaignId) => 
-              setDonationState({ ...donationState, campaignId })
-            } />
+            <PageLayout>
+              <QrScannerPage onCampaignSelect={(campaignId) => 
+                setDonationState({ ...donationState, campaignId })
+              } />
+            </PageLayout>
           </Route>
           
           {/* Área Administrativa */}
           <Route path="/admin">
-            {!user ? <AdminLogin /> : <AdminDashboard />}
+            {!user ? <AdminLogin /> : 
+              <PageLayout>
+                <AdminDashboard />
+              </PageLayout>
+            }
           </Route>
           
           <Route path="/admin/dashboard">
-            {!user ? <AdminLogin /> : <AdminDashboard />}
+            {!user ? <AdminLogin /> : 
+              <PageLayout>
+                <AdminDashboard />
+              </PageLayout>
+            }
           </Route>
           
           <Route path="/admin/campanha/nova">
-            {!user ? <AdminLogin /> : <CampaignForm />}
+            {!user ? <AdminLogin /> : 
+              <PageLayout>
+                <CampaignForm />
+              </PageLayout>
+            }
           </Route>
           
           <Route path="/admin/campanha/:id">
             {(params) => (
-              !user ? <AdminLogin /> : <CampaignForm campaignId={parseInt(params.id)} />
+              !user ? <AdminLogin /> : 
+                <PageLayout>
+                  <CampaignForm campaignId={parseInt(params.id)} />
+                </PageLayout>
             )}
           </Route>
           
           {/* Página 404 */}
-          <Route component={NotFound} />
+          <Route>
+            <PageLayout>
+              <NotFound />
+            </PageLayout>
+          </Route>
         </Switch>
       </main>
       
