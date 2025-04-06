@@ -200,14 +200,14 @@ export default function FinancialDonationPage() {
                             </Label>
                             {form.watch("paymentMethod") === "pix" && (
                               <div className="mt-3 p-4 bg-gray-50 rounded-md border border-gray-200">
-                                <div className="flex flex-col items-center space-y-4">
+                                <div className="flex items-start gap-6">
                                   <img 
                                     src={qrCodePix} 
                                     alt="QR Code PIX" 
                                     className="w-48 h-48 object-contain bg-white p-2 rounded-lg shadow-md border border-gray-200" 
                                   />
-                                  <div className="text-sm space-y-2 text-center">
-                                    <p className="flex items-center justify-center gap-2">
+                                  <div className="flex-1 text-sm space-y-4 pt-2">
+                                    <p className="flex items-center gap-2">
                                       <span className="font-semibold">Chave PIX:</span> 
                                       <span>b063400a-533d-4e5f-a845-d8165eb59c1c</span>
                                       <Button
