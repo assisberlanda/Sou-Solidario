@@ -1,5 +1,6 @@
 
 import PageLayout from "@/components/PageLayout";
+import { text } from "express";
 
 const AboutPage = () => {
   return (
@@ -13,7 +14,8 @@ const AboutPage = () => {
           </h2>
           
           <p className="mb-4">
-            Olá a todos! Meu nome é Assis Berlanda de Medeiros, estou me formando em Engenharia de Software pela Unicesumar, e após alguns cursos e projetos, em abril de 2024, finalizei um curso livre pela Alura de Google AI e havia um desafio de projeto para que eu criasse um aplicativo que tivesse um impacto social e resolvesse um problema iminente. E naquele mesmo mês havia acontecido a tragédia da enchente no Rio Grande do Sul, que devastou a cidade e destruiu famílias.
+            Olá a todos! Meu nome é Assis Berlanda de Medeiros, estou me formando em Engenharia de Software pela Unicesumar, e após alguns cursos e projetos, em abril de 2024, finalizei um curso livre pela Alura de Google AI e havia um desafio de projeto para que eu criasse um aplicativo que tivesse um impacto social e resolvesse um problema iminente. E naquele mesmo mês havia acontecido a tragédia da enchente no Rio Grande do Sul <a href="https://www.cnnbrasil.com.br/nacional/sul/rs/alagamentos-destruicao-e-183-mortes-relembre-a-tragedia-das-chuvas-no-rs-que-marcou-2024/" target="_blank">veja aqui</a>
+, que devastou a cidade e destruiu famílias.
           </p>
 
           <p className="mb-4">
