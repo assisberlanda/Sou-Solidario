@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLocation, useParams, Link } from "wouter";
-import qrCodePix from "@/assets/images/qr-code-pix.png";
+import qrCodePix from "../../assets/images/qr-code-pix.png";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
