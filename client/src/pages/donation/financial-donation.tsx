@@ -308,7 +308,7 @@ export default function FinancialDonationPage() {
                   {donation.paymentMethod === 'pix' && (
                     <>
                       <div className="flex flex-col items-center space-y-3">
-                        <img src="/assets/qr-code-pix.png" alt="QR Code PIX" className="w-48 h-48" />
+                        <img src="/src/assets/images/qr-code-pix.png" alt="QR Code PIX" className="w-48 h-48" />
                         <p><span className="font-semibold text-gray-900">Chave PIX:</span> <span className="text-gray-800">82005400149</span></p>
                         <p><span className="font-semibold text-gray-900">Beneficiário:</span> <span className="text-gray-800">Assis Berlanda de Medeiros</span></p>
                         <p className="text-gray-700 mt-1">Faça o pagamento usando o QR Code ou a chave PIX acima. O pagamento é processado instantaneamente.</p>
