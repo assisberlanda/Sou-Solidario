@@ -25,6 +25,7 @@ import AdminLogin from "@/pages/admin";
 import AdminDashboard from "@/pages/admin/dashboard";
 import CampaignForm from "@/pages/admin/campaign-form";
 import NotFound from "@/pages/not-found";
+import AboutPage from "@/pages/about";
 
 function App() {
   const [location, navigate] = useLocation();
