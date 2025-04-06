@@ -72,6 +72,13 @@ function App() {
               <Home />
             </PageLayout>
           </Route>
+
+          {/* Página Sobre */}
+          <Route path="/sobre">
+            <PageLayout showBackButton={true}>
+              <AboutPage />
+            </PageLayout>
+          </Route>
           
           {/* Área de Campanhas */}
           <Route path="/campanhas">
