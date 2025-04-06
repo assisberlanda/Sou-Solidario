@@ -204,7 +204,7 @@ export default function FinancialDonationPage() {
                                   <img 
                                     src={qrCodePix} 
                                     alt="QR Code PIX" 
-                                    className="w-48 h-48 object-contain bg-white p-2 rounded-lg shadow-sm" 
+                                    className="w-48 h-48 object-contain bg-white p-2 rounded-lg shadow-md border border-gray-200" 
                                   />
                                   <div className="text-sm space-y-2 text-center">
                                     <p className="flex items-center justify-center gap-2">
@@ -360,7 +360,11 @@ export default function FinancialDonationPage() {
                     <>
                       <div className="flex flex-col items-center space-y-3">
                         <a href={qrCodePix} target="_blank" rel="noopener noreferrer" className="cursor-pointer hover:opacity-80 transition-opacity">
-                          <img src={qrCodePix} alt="QR Code PIX" className="w-48 h-48" />
+                          <img 
+                            src={qrCodePix} 
+                            alt="QR Code PIX" 
+                            className="w-48 h-48 object-contain bg-white p-2 rounded-lg shadow-md border border-gray-200" 
+                          />
                         </a>
                         <div className="text-sm space-y-2 text-center">
                           <p className="flex items-center justify-center gap-2">
