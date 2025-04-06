@@ -15,7 +15,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { formatCurrency } from "@/lib/utils";
-import { ArrowLeft, ArrowRight, CheckCircle2, Wallet, CreditCard, Landmark, QrCode } from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckCircle2, Wallet, CreditCard, Landmark, QrCode, Copy } from "lucide-react";
 
 type FinancialDonationForm = z.infer<typeof financialDonationProcessSchema>;
 
@@ -324,7 +324,22 @@ export default function FinancialDonationPage() {
                     <>
                       <div className="flex flex-col items-center space-y-3">
                         <img src={qrCodePix} alt="QR Code PIX" className="w-48 h-48" />
-                        <p><span className="font-semibold text-gray-900">Chave PIX:</span> <span className="text-gray-800">82005400149</span></p>
+                        <p className="flex items-center gap-2">
+                          <span className="font-semibold text-gray-900">Chave PIX:</span>
+                          <span className="text-gray-800">b063400a-533d-4e5f-a845-d8165eb59c1c</span>
+                          <button
+                            onClick={() => {
+                              navigator.clipboard.writeText("b063400a-533d-4e5f-a845-d8165eb59c1c");
+                              toast({
+                                title: "Chave PIX copiada!",
+                                description: "A chave foi copiada para sua área de transferência.",
+                              });
+                            }}
+                            className="p-1 hover:bg-gray-100 rounded-md transition-colors"
+                          >
+                            <Copy className="h-4 w-4 text-gray-500" />
+                          </button>
+                        </p>
                         <p><span className="font-semibold text-gray-900">Beneficiário:</span> <span className="text-gray-800">Assis Berlanda de Medeiros</span></p>
                         <p className="text-gray-700 mt-1">Faça o pagamento usando o QR Code ou a chave PIX acima. O pagamento é processado instantaneamente.</p>
                       </div>
