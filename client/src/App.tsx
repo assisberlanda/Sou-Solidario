@@ -76,7 +76,7 @@ function App() {
 
           {/* Página Sobre */}
           <Route path="/sobre">
-            <PageLayout showBackButton={true}>
+            <PageLayout>
               <AboutPage />
             </PageLayout>
           </Route>
