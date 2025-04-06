@@ -211,20 +211,30 @@ export default function FinancialDonationPage() {
                               </div>
                             )}
                           </div>
-                          <div className="flex items-center space-x-2 rounded-md border border-gray-300 p-3 hover:bg-gray-50 bg-white">
-                            <RadioGroupItem value="cartao" id="cartao" />
-                            <Label htmlFor="cartao" className="flex items-center font-medium text-gray-800">
-                              <CreditCard className="mr-2 h-5 w-5 text-primary" />
-                              Cartão de Crédito
-                            </Label>
-                          </div>
-                          <div className="flex items-center space-x-2 rounded-md border border-gray-300 p-3 hover:bg-gray-50 bg-white">
-                            <RadioGroupItem value="deposito" id="deposito" />
-                            <Label htmlFor="deposito" className="flex items-center font-medium text-gray-800">
-                              <Landmark className="mr-2 h-5 w-5 text-primary" />
-                              Depósito Bancário
-                            </Label>
-                          </div>
+                          <Label
+                            htmlFor="cartao"
+                            className="block cursor-pointer"
+                          >
+                            <div className="flex items-center space-x-2 rounded-md border border-gray-300 p-3 hover:bg-gray-50 bg-white">
+                              <RadioGroupItem value="cartao" id="cartao" />
+                              <div className="flex items-center font-medium text-gray-800">
+                                <CreditCard className="mr-2 h-5 w-5 text-primary" />
+                                Cartão de Crédito
+                              </div>
+                            </div>
+                          </Label>
+                          <Label
+                            htmlFor="deposito"
+                            className="block cursor-pointer"
+                          >
+                            <div className="flex items-center space-x-2 rounded-md border border-gray-300 p-3 hover:bg-gray-50 bg-white">
+                              <RadioGroupItem value="deposito" id="deposito" />
+                              <div className="flex items-center font-medium text-gray-800">
+                                <Landmark className="mr-2 h-5 w-5 text-primary" />
+                                Depósito Bancário
+                              </div>
+                            </div>
+                          </Label>
                         </RadioGroup>
                       </FormControl>
                       <FormMessage />
