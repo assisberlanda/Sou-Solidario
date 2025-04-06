@@ -155,7 +155,7 @@ const HomePage = () => {
               </p>
               <div className="flex flex-col md:flex-row items-center gap-4">
                 <Link href="/qrcode">
-                  <Button className="flex items-center bg-secondary text-white px-4 py-2 rounded-lg hover:bg-secondary-dark transition">
+                  <Button className="flex items-center">
                     <QrCode className="mr-2 h-4 w-4" />
                     Escanear QR Code
                   </Button>
