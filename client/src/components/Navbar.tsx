@@ -42,6 +42,7 @@ const Navbar = ({ user }: NavbarProps) => {
 
   const links = [
     { href: "/", label: "Início" },
+    { href: "/", label: "Sobre" },
     { href: "/campanhas", label: "Campanhas" },
     { href: "/doar/campanha", label: "Fazer Doação" },
   ];

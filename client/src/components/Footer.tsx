@@ -56,7 +56,7 @@ const Footer = () => {
             <ul className="space-y-2 text-sm">
               <li className="flex items-center text-[#ffcc80]">
                 <Mail className="w-5 h-5 text-[#ffb74d] mr-2" />
-                <span>contato@sousolidario.org.br</span>
+                <span>berlanda.medeiros@gmail.com</span>
               </li>
               <li className="flex items-center text-[#ffcc80]">
                 <Phone className="w-5 h-5 text-[#ffb74d] mr-2" />
@@ -94,12 +94,15 @@ const Footer = () => {
                 <Twitter className="text-[#ffcc80]" size={18} />
               </a>
               <a
-                href="#"
+                href="https://www.linkedin.com/in/assismedeiros/"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="bg-[#ffb74d] bg-opacity-20 hover:bg-opacity-30 rounded-full w-10 h-10 flex items-center justify-center transition"
                 aria-label="LinkedIn"
               >
                 <Linkedin className="text-[#ffcc80]" size={18} />
               </a>
+
             </div>
 
             <div className="mt-4">
