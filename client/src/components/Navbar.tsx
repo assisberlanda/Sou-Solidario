@@ -124,7 +124,7 @@ const Navbar = ({ user }: NavbarProps) => {
                       <a
                         className={cn(
                           "text-white hover:text-accent-light font-medium transition py-2 px-4 rounded-md",
-                          isLinkActive(link.href) && "bg-primary/20 text-accent-light"
+                          isLinkActive(link.href) && "bg-[#26c485]/20 text-white font-bold"
                         )}
                       >
                         {link.label}
