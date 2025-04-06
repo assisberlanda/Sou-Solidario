@@ -203,7 +203,24 @@ export default function FinancialDonationPage() {
                                 <div className="flex flex-col items-center space-y-4">
                                   <img src={qrCodePix} alt="QR Code PIX" className="w-48 h-48" />
                                   <div className="text-sm space-y-2 text-center">
-                                    <p><span className="font-semibold">Chave PIX:</span> b063400a-533d-4e5f-a845-d8165eb59c1c</p>
+                                    <p className="flex items-center justify-center gap-2">
+                                      <span className="font-semibold">Chave PIX:</span> 
+                                      <span>b063400a-533d-4e5f-a845-d8165eb59c1c</span>
+                                      <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-8 w-8"
+                                        onClick={() => {
+                                          navigator.clipboard.writeText("b063400a-533d-4e5f-a845-d8165eb59c1c");
+                                          toast({
+                                            title: "Chave PIX copiada!",
+                                            description: "A chave foi copiada para sua área de transferência.",
+                                          });
+                                        }}
+                                      >
+                                        <Copy className="h-4 w-4" />
+                                      </Button>
+                                    </p>
                                     <p><span className="font-semibold">Nome:</span> Assis Berlanda de Medeiros</p>
                                     <p><span className="font-semibold">Instituição:</span> Mercado Pago</p>
                                   </div>
@@ -342,7 +359,24 @@ export default function FinancialDonationPage() {
                           <img src={qrCodePix} alt="QR Code PIX" className="w-48 h-48" />
                         </a>
                         <div className="text-sm space-y-2 text-center">
-                          <p><span className="font-semibold">Chave PIX:</span> b063400a-533d-4e5f-a845-d8165eb59c1c</p>
+                          <p className="flex items-center justify-center gap-2">
+                                      <span className="font-semibold">Chave PIX:</span> 
+                                      <span>b063400a-533d-4e5f-a845-d8165eb59c1c</span>
+                                      <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-8 w-8"
+                                        onClick={() => {
+                                          navigator.clipboard.writeText("b063400a-533d-4e5f-a845-d8165eb59c1c");
+                                          toast({
+                                            title: "Chave PIX copiada!",
+                                            description: "A chave foi copiada para sua área de transferência.",
+                                          });
+                                        }}
+                                      >
+                                        <Copy className="h-4 w-4" />
+                                      </Button>
+                                    </p>
                           <p><span className="font-semibold">Nome:</span> Assis Berlanda de Medeiros</p>
                           <p><span className="font-semibold">Instituição:</span> Mercado Pago</p>
                         </div>
