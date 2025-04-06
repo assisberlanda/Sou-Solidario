@@ -323,25 +323,14 @@ export default function FinancialDonationPage() {
                   {donation.paymentMethod === 'pix' && (
                     <>
                       <div className="flex flex-col items-center space-y-3">
-                        <img src={qrCodePix} alt="QR Code PIX" className="w-48 h-48" />
-                        <p className="flex items-center gap-2">
-                          <span className="font-semibold text-gray-900">Chave PIX:</span>
-                          <span className="text-gray-800">b063400a-533d-4e5f-a845-d8165eb59c1c</span>
-                          <button
-                            onClick={() => {
-                              navigator.clipboard.writeText("b063400a-533d-4e5f-a845-d8165eb59c1c");
-                              toast({
-                                title: "Chave PIX copiada!",
-                                description: "A chave foi copiada para sua área de transferência.",
-                              });
-                            }}
-                            className="p-1 hover:bg-gray-100 rounded-md transition-colors"
-                          >
-                            <Copy className="h-4 w-4 text-gray-500" />
-                          </button>
-                        </p>
-                        <p><span className="font-semibold text-gray-900">Beneficiário:</span> <span className="text-gray-800">Assis Berlanda de Medeiros</span></p>
-                        <p className="text-gray-700 mt-1">Faça o pagamento usando o QR Code ou a chave PIX acima. O pagamento é processado instantaneamente.</p>
+                        <a href={qrCodePix} target="_blank" rel="noopener noreferrer" className="cursor-pointer hover:opacity-80 transition-opacity">
+                          <img src={qrCodePix} alt="QR Code PIX" className="w-48 h-48" />
+                        </a>
+                        <div className="text-sm space-y-2 text-center">
+                          <p><span className="font-semibold">Chave PIX:</span> b063400a-533d-4e5f-a845-d8165eb59c1c</p>
+                          <p><span className="font-semibold">Nome:</span> Assis Berlanda de Medeiros</p>
+                          <p><span className="font-semibold">Instituição:</span> Mercado Pago</p>
+                        </div>
                       </div>
                     </>
                   )}
