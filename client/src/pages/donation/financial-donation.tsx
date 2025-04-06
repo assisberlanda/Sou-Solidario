@@ -204,9 +204,9 @@ export default function FinancialDonationPage() {
                                   <img 
                                     src={qrCodePix} 
                                     alt="QR Code PIX" 
-                                    className="w-48 h-48 object-contain bg-white p-2 rounded-lg shadow-md border border-gray-200" 
+                                    className="w-32 h-32 object-contain bg-white p-2 rounded-lg shadow-md border border-gray-200" 
                                   />
-                                  <div className="flex-1 text-sm space-y-4 pt-2">
+                                  <div className="flex-1 text-sm space-y-4">
                                     <p className="flex items-center gap-2">
                                       <span className="font-semibold">Chave PIX:</span> 
                                       <span>b063400a-533d-4e5f-a845-d8165eb59c1c</span>
@@ -363,7 +363,7 @@ export default function FinancialDonationPage() {
                           <img 
                             src={qrCodePix} 
                             alt="QR Code PIX" 
-                            className="w-48 h-48 object-contain bg-white p-2 rounded-lg shadow-md border border-gray-200" 
+                            className="w-32 h-32 object-contain bg-white p-2 rounded-lg shadow-md border border-gray-200" 
                           />
                         </a>
                         <div className="text-sm space-y-2 text-center">
