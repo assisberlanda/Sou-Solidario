@@ -109,7 +109,7 @@ function App() {
             </PageLayout>
           </Route>
           
-          <Route path="/doar/campanha">
+          <Route path="/doar/selecionar-campanha">
             <PageLayout>
               <CampaignSelection 
                 onCampaignSelect={(campaignId) => 
