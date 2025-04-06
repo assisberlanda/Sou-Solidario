@@ -186,13 +186,18 @@ export default function FinancialDonationPage() {
                           className="flex flex-col space-y-1"
                         >
                           <div>
-                            <div className="flex items-center space-x-2 rounded-md border border-gray-300 p-3 hover:bg-gray-50 bg-white">
-                              <RadioGroupItem value="pix" id="pix" />
-                              <Label htmlFor="pix" className="flex items-center font-medium text-gray-800">
-                                <QrCode className="mr-2 h-5 w-5 text-primary" />
-                                PIX
-                              </Label>
-                            </div>
+                            <Label
+                              htmlFor="pix"
+                              className="block cursor-pointer"
+                            >
+                              <div className="flex items-center space-x-2 rounded-md border border-gray-300 p-3 hover:bg-gray-50 bg-white">
+                                <RadioGroupItem value="pix" id="pix" />
+                                <div className="flex items-center font-medium text-gray-800">
+                                  <QrCode className="mr-2 h-5 w-5 text-primary" />
+                                  PIX
+                                </div>
+                              </div>
+                            </Label>
                             {form.watch("paymentMethod") === "pix" && (
                               <div className="mt-3 p-4 bg-gray-50 rounded-md border border-gray-200">
                                 <div className="flex flex-col items-center space-y-4">
