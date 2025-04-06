@@ -35,7 +35,7 @@ const HomePage = () => {
             A plataforma Sou Solidário conecta pessoas que desejam ajudar com vítimas de desastres naturais e situações de emergência.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/doar/campanha">
+            <Link href="/doar/selecionar-campanha">
               <Button className="btn-compassion font-semibold px-6 py-3 h-auto text-base">
                 Quero Doar Agora
                 <ArrowRight className="ml-2 h-5 w-5" />
