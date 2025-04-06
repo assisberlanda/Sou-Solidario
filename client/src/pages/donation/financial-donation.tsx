@@ -184,12 +184,26 @@ export default function FinancialDonationPage() {
                           defaultValue={field.value}
                           className="flex flex-col space-y-1"
                         >
-                          <div className="flex items-center space-x-2 rounded-md border border-gray-300 p-3 hover:bg-gray-50 bg-white">
-                            <RadioGroupItem value="pix" id="pix" />
-                            <Label htmlFor="pix" className="flex items-center font-medium text-gray-800">
-                              <QrCode className="mr-2 h-5 w-5 text-primary" />
-                              PIX
-                            </Label>
+                          <div>
+                            <div className="flex items-center space-x-2 rounded-md border border-gray-300 p-3 hover:bg-gray-50 bg-white">
+                              <RadioGroupItem value="pix" id="pix" />
+                              <Label htmlFor="pix" className="flex items-center font-medium text-gray-800">
+                                <QrCode className="mr-2 h-5 w-5 text-primary" />
+                                PIX
+                              </Label>
+                            </div>
+                            {form.watch("paymentMethod") === "pix" && (
+                              <div className="mt-3 p-4 bg-gray-50 rounded-md border border-gray-200">
+                                <div className="flex flex-col items-center space-y-4">
+                                  <img src="/src/assets/images/qr-code-pix.png" alt="QR Code PIX" className="w-48 h-48" />
+                                  <div className="text-sm space-y-2 text-center">
+                                    <p><span className="font-semibold">Chave PIX:</span> b063400a-533d-4e5f-a845-d8165eb59c1c</p>
+                                    <p><span className="font-semibold">Nome:</span> Assis Berlanda de Medeiros</p>
+                                    <p><span className="font-semibold">Instituição:</span> Mercado Pago</p>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
                           </div>
                           <div className="flex items-center space-x-2 rounded-md border border-gray-300 p-3 hover:bg-gray-50 bg-white">
                             <RadioGroupItem value="cartao" id="cartao" />
