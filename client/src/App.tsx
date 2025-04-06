@@ -119,24 +119,23 @@ function App() {
             </PageLayout>
           </Route>
           
-          <Route path="/doar/:id">
-            {(params) => {
-              const id = parseInt(params.id);
-              if (isNaN(id)) {
-                return <NotFound />;
-              }
-              return (
-                <PageLayout>
-                  <CampaignItems 
-                    campaignId={id} 
-                    onItemsSelect={(selectedItemIds) => {
-                      setDonationState({ ...donationState, campaignId: id });
-                      navigate(`/doar/items/${id}`);
-                    }}
-                  />
-                </PageLayout>
-              );
-            }}
+          <Route path="/doar/itens">
+            <PageLayout>
+              {donationState.campaignId ? (
+                <ItemSelection 
+                  campaignId={donationState.campaignId} 
+                  onItemsSelect={(items) => 
+                    setDonationState({ ...donationState, items })
+                  }
+                />
+              ) : (
+                <CampaignSelection 
+                  onCampaignSelect={(campaignId) => 
+                    setDonationState({ ...donationState, campaignId })
+                  }
+                />
+              )}
+            </PageLayout>
           </Route>
           
           <Route path="/doar/dados">

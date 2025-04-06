@@ -36,7 +36,7 @@ const CampaignSelection = ({ onCampaignSelect }: CampaignSelectionProps) => {
   // Função para lidar com a seleção de campanha
   const handleSelectCampaign = (campaignId: number) => {
     onCampaignSelect(campaignId);
-    navigate(`/doar/${campaignId}`);
+    navigate(`/doar/itens`);
   };
 
   // Função para lidar com o scanner de QR Code
