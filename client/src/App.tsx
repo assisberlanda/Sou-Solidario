@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { Switch, Route, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 
-// Componentes
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import PageLayout from "@/components/PageLayout";
@@ -21,9 +20,11 @@ import Confirmation from "@/pages/donation/confirmation";
 import QrScannerPage from "@/pages/donation/qr-scanner";
 import FinancialDonationPage from "@/pages/donation/financial-donation";
 import CampaignByCode from "@/pages/donation/campaign-by-code";
-import AdminLogin from "@/pages/admin";
-import AdminDashboard from "@/pages/admin/dashboard";
-import CampaignForm from "@/pages/admin/campaign-form";
+import Login from "@/pages/login/Login";
+import CadastroEmpresa from "@/pages/CadastroEmpresa";
+import CadastroCampanha from "@/pages/CadastroCampanha";
+import MinhasCampanhas from "@/pages/MinhasCampanhas";
+import Dashboard from "@/pages/Dashboard";
 import NotFound from "@/pages/not-found";
 import AboutPage from "@/pages/about";
 
@@ -31,16 +32,13 @@ function App() {
   const [location, navigate] = useLocation();
   const isAdminRoute = location.startsWith("/admin");
 
-  // Verificar se o usuário está autenticado
-  const { data: user, isLoading: isAuthLoading } = useQuery({
+  const { data: user } = useQuery({
     queryKey: ["/api/auth/me"],
     retry: false,
-    // Não mostra erro para usuários não autenticados
     refetchOnWindowFocus: false,
     refetchOnMount: false,
   });
 
-  // Estado para controlar o processo de doação
   const [donationState, setDonationState] = useState<{
     campaignId?: number;
     items?: { neededItemId: number; quantity: number }[];
@@ -49,14 +47,12 @@ function App() {
     donationId?: number;
   }>({});
 
-  // Reset donation state when navigating to home
   useEffect(() => {
     if (location === "/") {
       setDonationState({});
     }
   }, [location]);
 
-  // Definir título da página
   useEffect(() => {
     document.title = "Sou Solidário - Plataforma de Doações";
   }, []);
@@ -64,7 +60,7 @@ function App() {
   return (
     <div className="flex flex-col min-h-screen bg-neutral-50">
       {!isAdminRoute && <Navbar user={user} />}
-      
+
       <main className="flex-grow mt-16">
         <Switch>
           {/* Página Inicial */}
@@ -74,125 +70,162 @@ function App() {
             </PageLayout>
           </Route>
 
-          {/* Página Sobre */}
+          {/* Sobre */}
           <Route path="/sobre">
             <PageLayout>
               <AboutPage />
             </PageLayout>
           </Route>
-          
-          {/* Área de Campanhas */}
+
+          {/* Cadastro Empresa */}
+          <Route path="/cadastro-empresa">
+            <PageLayout>
+              <CadastroEmpresa />
+            </PageLayout>
+          </Route>
+
+          {/* Cadastro Campanha */}
+          <Route path="/cadastro-campanha">
+            <PageLayout>
+              <CadastroCampanha />
+            </PageLayout>
+          </Route>
+
+          {/* Minhas Campanhas */}
+          <Route path="/minhas-campanhas">
+            <PageLayout showBackButton>
+              <MinhasCampanhas />
+            </PageLayout>
+          </Route>
+
+          {/* Área Administrativa */}
+          <Route path="/admin">
+            {!user ? (
+              <Login />
+            ) : (
+              <PageLayout>
+                <Dashboard />
+              </PageLayout>
+            )}
+          </Route>
+
+          {/* Listagem de Campanhas Públicas */}
           <Route path="/campanhas">
             <PageLayout showBackButton={false}>
               <CampaignsPage />
             </PageLayout>
           </Route>
-          
+
+          {/* Detalhes da Campanha */}
           <Route path="/campanha/:id">
             {(params) => {
               const id = parseInt(params.id);
-              if (isNaN(id)) {
-                return <NotFound />;
-              }
+              if (isNaN(id)) return <NotFound />;
               return (
-                <PageLayout showBackButton={true}>
+                <PageLayout showBackButton>
                   <CampaignDetails campaignId={id} />
                 </PageLayout>
               );
             }}
           </Route>
-          
+
           {/* Fluxo de Doação */}
           <Route path="/doar">
             <PageLayout>
               <DonationProcess />
             </PageLayout>
           </Route>
-          
+
           <Route path="/doar/selecionar-campanha">
             <PageLayout>
-              <CampaignSelection 
-                onCampaignSelect={(campaignId) => 
+              <CampaignSelection
+                onCampaignSelect={(campaignId) =>
                   setDonationState({ ...donationState, campaignId })
-                } 
+                }
               />
             </PageLayout>
           </Route>
-          
+
           <Route path="/doar/itens">
             <PageLayout>
               {donationState.campaignId ? (
-                <ItemSelection 
-                  campaignId={donationState.campaignId} 
-                  onItemsSelect={(items) => 
+                <ItemSelection
+                  campaignId={donationState.campaignId}
+                  onItemsSelect={(items) =>
                     setDonationState({ ...donationState, items })
                   }
                 />
               ) : (
-                <CampaignSelection 
-                  onCampaignSelect={(campaignId) => 
+                <CampaignSelection
+                  onCampaignSelect={(campaignId) =>
                     setDonationState({ ...donationState, campaignId })
                   }
                 />
               )}
             </PageLayout>
           </Route>
-          
+
           <Route path="/doar/dados">
             <PageLayout>
               {donationState.campaignId && donationState.items ? (
-                <DonorInfo 
-                  onDonorInfoSubmit={(donorInfo) => 
+                <DonorInfo
+                  onDonorInfoSubmit={(donorInfo) =>
                     setDonationState({ ...donationState, donorInfo })
                   }
                 />
               ) : (
-                <CampaignSelection 
-                  onCampaignSelect={(campaignId) => 
+                <CampaignSelection
+                  onCampaignSelect={(campaignId) =>
                     setDonationState({ ...donationState, campaignId })
                   }
                 />
               )}
             </PageLayout>
           </Route>
-          
+
           <Route path="/doar/agendar">
             <PageLayout>
-              {donationState.campaignId && donationState.items && donationState.donorInfo ? (
-                <Schedule 
-                  onScheduleSubmit={(schedule) => 
+              {donationState.campaignId &&
+              donationState.items &&
+              donationState.donorInfo ? (
+                <Schedule
+                  onScheduleSubmit={(schedule) =>
                     setDonationState({ ...donationState, schedule })
                   }
                 />
               ) : (
-                <CampaignSelection 
-                  onCampaignSelect={(campaignId) => 
+                <CampaignSelection
+                  onCampaignSelect={(campaignId) =>
                     setDonationState({ ...donationState, campaignId })
                   }
                 />
               )}
             </PageLayout>
           </Route>
-          
+
           <Route path="/doar/confirmacao">
             <PageLayout>
-              {donationState.campaignId && donationState.items && donationState.donorInfo && donationState.schedule ? (
-                <Confirmation 
-                  donationData={donationState} 
-                  onDonationComplete={(donationId) => 
+              {donationState.campaignId &&
+              donationState.items &&
+              donationState.donorInfo &&
+              donationState.schedule ? (
+                <Confirmation
+                  donationData={donationState}
+                  onDonationComplete={(donationId) =>
                     setDonationState({ ...donationState, donationId })
                   }
                 />
               ) : (
-                <CampaignSelection 
-                  onCampaignSelect={(campaignId) => 
+                <CampaignSelection
+                  onCampaignSelect={(campaignId) =>
                     setDonationState({ ...donationState, campaignId })
                   }
                 />
               )}
             </PageLayout>
           </Route>
-          
+
+          {/* Doação financeira */}
           <Route path="/doacao-financeira/:id">
             {(params) => (
               <PageLayout>
@@ -200,103 +233,69 @@ function App() {
               </PageLayout>
             )}
           </Route>
-          
+
           <Route path="/doar/codigo/:code">
-            {(params) => {
-              return (
-                <PageLayout>
-                  <CampaignByCode 
-                    code={params.code} 
-                    onCampaignSelect={(campaignId) => {
-                      setDonationState({ ...donationState, campaignId });
-                      navigate(`/doar/items/${campaignId}`);
-                    }}
-                  />
-                </PageLayout>
-              );
-            }}
+            {(params) => (
+              <PageLayout>
+                <CampaignByCode
+                  code={params.code}
+                  onCampaignSelect={(campaignId) => {
+                    setDonationState({ ...donationState, campaignId });
+                    navigate(`/doar/items/${campaignId}`);
+                  }}
+                />
+              </PageLayout>
+            )}
           </Route>
-          
+
           <Route path="/doar/:id">
             {(params) => {
               const id = parseInt(params.id);
-              if (isNaN(id)) {
-                return <NotFound />;
-              }
+              if (isNaN(id)) return <NotFound />;
               return (
                 <PageLayout>
-                  <CampaignItems 
-                    campaignId={id} 
-                    onItemsSelect={(selectedItemIds) => 
-                      navigate(`/doar/items/${id}`) 
+                  <CampaignItems
+                    campaignId={id}
+                    onItemsSelect={(selectedItemIds) =>
+                      navigate(`/doar/items/${id}`)
                     }
                   />
                 </PageLayout>
               );
             }}
           </Route>
-          
+
           <Route path="/doar/items/:id">
             {(params) => {
               const id = parseInt(params.id);
-              if (isNaN(id)) {
-                return <NotFound />;
-              }
+              if (isNaN(id)) return <NotFound />;
               return (
                 <PageLayout>
-                  <ItemSelection 
-                    campaignId={id} 
-                    onItemsSelect={(items) => 
-                      setDonationState({ ...donationState, campaignId: id, items })
+                  <ItemSelection
+                    campaignId={id}
+                    onItemsSelect={(items) =>
+                      setDonationState({
+                        ...donationState,
+                        campaignId: id,
+                        items,
+                      })
                     }
                   />
                 </PageLayout>
               );
             }}
           </Route>
-          
+
           <Route path="/qrcode">
             <PageLayout>
-              <QrScannerPage onCampaignSelect={(campaignId) => 
-                setDonationState({ ...donationState, campaignId })
-              } />
+              <QrScannerPage
+                onCampaignSelect={(campaignId) =>
+                  setDonationState({ ...donationState, campaignId })
+                }
+              />
             </PageLayout>
           </Route>
-          
-          {/* Área Administrativa */}
-          <Route path="/admin">
-            {!user ? <AdminLogin /> : 
-              <PageLayout>
-                <AdminDashboard />
-              </PageLayout>
-            }
-          </Route>
-          
-          <Route path="/admin/dashboard">
-            {!user ? <AdminLogin /> : 
-              <PageLayout>
-                <AdminDashboard />
-              </PageLayout>
-            }
-          </Route>
-          
-          <Route path="/admin/campanha/nova">
-            {!user ? <AdminLogin /> : 
-              <PageLayout>
-                <CampaignForm />
-              </PageLayout>
-            }
-          </Route>
-          
-          <Route path="/admin/campanha/:id">
-            {(params) => (
-              !user ? <AdminLogin /> : 
-                <PageLayout>
-                  <CampaignForm campaignId={parseInt(params.id)} />
-                </PageLayout>
-            )}
-          </Route>
-          
+
           {/* Página 404 */}
           <Route>
             <PageLayout>
@@ -305,7 +304,7 @@ function App() {
           </Route>
         </Switch>
       </main>
-      
+
       {!isAdminRoute && <Footer />}
     </div>
   );

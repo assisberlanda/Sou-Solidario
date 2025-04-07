@@ -10,7 +10,7 @@ import {
   insertDonationItemSchema,
   insertFinancialDonationSchema,
   financialDonationProcessSchema
-} from "@shared/schema";
+} from "../shared/schema"; // Adjusted the path to a relative one
 import QRCode from "qrcode";
 import session from "express-session";
 import MemoryStore from "memorystore";

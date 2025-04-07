@@ -49,3 +49,7 @@ mode = "sequential"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npm run dev"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm install hono @hono/node-server @hono/cors @hono/vercel @supabase/supabase-js uuid"
