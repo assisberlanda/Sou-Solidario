@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ChatBot from "@/components/ChatBot";
 import { Campaign } from "@shared/schema";
 import { ArrowRight, Droplet, Home, Heart, Clock, MapPin, Search, QrCode } from "lucide-react";
+import { useAuth } from "../hooks/useAuth.ts";
 
 const HomePage = () => {
   const { data: campaigns, isLoading } = useQuery<Campaign[]>({

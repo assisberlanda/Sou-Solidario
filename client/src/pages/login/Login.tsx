@@ -8,9 +8,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
 import { queryClient } from "@/lib/queryClient";
-import { HandHelping, Mail, Lock } from "lucide-react";
+import { HandHelping, Mail, Lock, ArrowLeft } from "lucide-react";
+import { loginEmpresa } from "@/services/authService"; // <-- Novo import do serviço
 
 const loginSchema = z.object({
   email: z.string().email("Email inválido"),
@@ -37,8 +37,8 @@ const Login = () => {
   const onSubmit = async (data: { email: string; password: string }) => {
     setIsLoading(true);
     try {
-      await apiRequest("POST", "/api/auth/login", data);
-      
+      await loginEmpresa(data);
+
       queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
 
       toast({
@@ -46,13 +46,23 @@ const Login = () => {
         description: "Bem-vindo de volta!",
       });
 
-      navigate("/minhas-campanhas"); // Página de campanhas agora será exibida após login.
-    } catch (error) {
-      toast({
-        title: "Erro ao fazer login",
-        description: "Email ou senha inválidos.",
-        variant: "destructive",
-      });
+      navigate("/minhas-campanhas");
+    } catch (error: any) {
+      const errorMessage = error.message || "";
+
+      if (errorMessage.includes("Empresa não cadastrada")) {
+        toast({
+          title: "Empresa não cadastrada",
+          description: "Crie uma Conta para acessar a plataforma.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Erro ao fazer login",
+          description: "Email ou senha inválidos.",
+          variant: "destructive",
+        });
+      }
     } finally {
       setIsLoading(false);
     }
@@ -66,6 +76,14 @@ const Login = () => {
           <h1 className="text-3xl font-bold ml-2">Sou Solidário</h1>
         </div>
         <p className="text-gray-600 mt-2">Área Administrativa</p>
+      </div>
+
+      {/* Botão Voltar */}
+      <div className="mb-4">
+        <Button variant="outline" onClick={() => navigate("/")} className="flex items-center gap-2">
+          <ArrowLeft className="h-4 w-4" />
+          Voltar
+        </Button>
       </div>
 
       <Card>
@@ -104,6 +122,7 @@ const Login = () => {
             </a>
           </div>
 
+          {/* Link para criar conta */}
           <div className="text-center mt-4 text-sm text-gray-600">
             Não possui conta?{" "}
             <a href="/cadastro-empresa" className="text-primary hover:underline">

@@ -18,6 +18,14 @@ import { z } from "zod";
 
 const SessionStore = MemoryStore(session);
 
+app.get("/api/auth/me", (req: Request, res: Response) => {
+  const user = req.session.user;
+  if (!user) {
+    return res.status(401).json({ message: "Não autenticado" });
+  }
+  return res.json(user); // Aqui retorna { id, email, nome, cidade, bairro }
+});
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // Servir arquivos estáticos da pasta assets
   app.use('/assets', express.static(path.join(process.cwd(), 'client/src/assets/images')));
@@ -606,6 +614,65 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(500).json({ message: "Erro ao processar mensagem" });
     }
   });
+
+  import { createClient } from "@supabase/supabase-js"; // já deve ter importado no começo
+
+const supabase = createClient(
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_KEY!
+);
+
+app.post("/api/auth/login", async (req: Request, res: Response) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ message: "Email e senha obrigatórios." });
+    }
+
+    // Buscar empresa pelo email
+    const { data: empresas, error } = await supabase
+      .from("empresas")
+      .select("*")
+      .eq("email", email);
+
+    if (error) {
+      return res.status(500).json({ message: "Erro ao buscar empresa." });
+    }
+
+    const empresa = empresas?.[0];
+
+    if (!empresa) {
+      return res.status(401).json({ message: "Empresa não cadastrada" });
+    }
+
+    // Verificar senha (atenção: em produção usar senha com hash)
+    if (empresa.password !== password) {
+      return res.status(401).json({ message: "Email ou senha inválidos" });
+    }
+
+    // Login realizado, cria sessão
+    // @ts-ignore
+    req.session.user = {
+      id: empresa.id,
+      email: empresa.email,
+      nome: empresa.nome,
+      cidade: empresa.cidade,
+      bairro: empresa.bairro,
+    };
+
+    return res.json({
+      id: empresa.id,
+      email: empresa.email,
+      nome: empresa.nome,
+      cidade: empresa.cidade,
+      bairro: empresa.bairro,
+    });
+
+  } catch (error) {
+    return res.status(500).json({ message: "Erro no servidor" });
+  }
+});
 
   // Servir imagens da pasta de assets
   app.use("/assets", express.static(path.join(process.cwd(), "client/src/assets/images")));
