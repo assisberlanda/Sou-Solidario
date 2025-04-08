@@ -85,6 +85,8 @@ const Navbar = ({ user }: NavbarProps) => {
                 <a className="text-white hover:text-accent-light font-medium transition flex items-center">
                   <UserCircle className="mr-1" size={18} />
                   <span>{user.name}</span>
+                  {/* Exibindo o nome da empresa */}
+                  {user.empresa && <span className="ml-2 text-sm text-white">({user.empresa})</span>}
                 </a>
               </Link>
               <Button
@@ -140,6 +142,8 @@ const Navbar = ({ user }: NavbarProps) => {
                         <a className="text-white hover:text-accent-light font-medium transition py-2 px-4 rounded-md flex items-center">
                           <UserCircle className="mr-1" size={18} />
                           <span>{user.name}</span>
+                          {/* Exibindo o nome da empresa */}
+                          {user.empresa && <span className="ml-2 text-sm text-white">({user.empresa})</span>}
                         </a>
                       </Link>
                     </SheetClose>

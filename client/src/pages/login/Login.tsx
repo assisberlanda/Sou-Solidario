@@ -46,7 +46,7 @@ const Login = () => {
         description: "Bem-vindo de volta!",
       });
 
-      navigate("/minhas-campanhas"); // <-- Atualizado aqui!
+      navigate("/minhas-campanhas"); // Página de campanhas agora será exibida após login.
     } catch (error) {
       toast({
         title: "Erro ao fazer login",
@@ -96,6 +96,13 @@ const Login = () => {
               {isLoading ? "Entrando..." : "Entrar"}
             </Button>
           </form>
+
+          {/* Link para recuperação de senha */}
+          <div className="text-center mt-4 text-sm text-gray-600">
+            <a href="/recuperar-senha" className="text-primary hover:underline">
+              Esqueci a senha
+            </a>
+          </div>
 
           <div className="text-center mt-4 text-sm text-gray-600">
             Não possui conta?{" "}

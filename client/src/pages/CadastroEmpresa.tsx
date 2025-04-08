@@ -1,4 +1,3 @@
-// client/src/pages/CadastroEmpresa.tsx
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { z } from "zod";
@@ -6,6 +5,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea"; // Alterado para Textarea para o campo sobre
+import { Label } from "@/components/ui/label";
 
 const cadastroEmpresaSchema = z.object({
   nome: z.string().min(3, "Nome da empresa é obrigatório"),
@@ -97,8 +98,9 @@ export default function CadastroEmpresa() {
         {errors.bairro && <p className="text-red-500 text-sm">{errors.bairro.message}</p>}
       </div>
 
+      {/* Alteração aqui - Campo "Sobre a Empresa" alterado para Textarea */}
       <div className="space-y-2">
-        <Input
+        <Textarea
           {...register("sobre")}
           placeholder="Sobre a Empresa"
           className="border p-2 w-full"

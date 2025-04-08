@@ -1,5 +1,3 @@
-// client/src/pages/MinhasCampanhas.tsx
-
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
@@ -23,10 +21,16 @@ export default function MinhasCampanhas() {
 
   async function carregarMinhasCampanhas() {
     setLoading(true);
-    const res = await fetch("/api/minhas-campanhas");
-    if (res.ok) {
-      const data = await res.json();
-      setCampanhas(data);
+    try {
+      const res = await fetch("/api/minhas-campanhas");
+      if (res.ok) {
+        const data = await res.json();
+        setCampanhas(data);
+      } else {
+        alert("Erro ao carregar campanhas");
+      }
+    } catch (error) {
+      alert("Erro ao carregar campanhas");
     }
     setLoading(false);
   }
@@ -67,7 +71,7 @@ export default function MinhasCampanhas() {
           {campanhas.map((campanha) => (
             <Card key={campanha.id}>
               <CardContent className="p-4 space-y-4">
-                {/* Corrigido aqui */}
+                {/* Exibe a imagem da campanha, se existir */}
                 {campanha.imagens && campanha.imagens.length > 0 && (
                   <img
                     src={campanha.imagens[0]}
