@@ -1,11 +1,16 @@
+// client/src/pages/campanhas.tsx
 
+// Importe o componente de listagem completo
 import ListarCampanhas from "@/components/ListarCampanhas";
+// Importe o PageLayout se estiver usando para envolver o conteúdo da página
+import PageLayout from "@/components/PageLayout";
+
 
 export default function CampanhasPage() {
   return (
-    <div className="p-6">
-      <h1 className="text-3xl font-bold mb-6">Campanhas</h1>
-      <ListarCampanhas />
-    </div>
+    // Usar PageLayout para envolver o conteúdo da página Campanhas
+    <PageLayout showBackButton={false}> {/* Esta página não tem botão voltar específico do layout */}
+       <ListarCampanhas /> {/* Renderiza o componente que lista e busca as campanhas */}
+    </PageLayout>
   );
 }
