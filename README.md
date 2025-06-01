@@ -1,7 +1,5 @@
 # 🤝 Sou Solidário
 
-<!-- ![Logo do Projeto (Opcional)](/path/to/your/logo.png) --> <!-- Uncomment and replace with the path to your logo image --> 
-
 ## 🎯 Visão Geral
 
 O **Sou Solidário** é uma plataforma digital responsiva concebida durante um projeto pessoal em maio de 2024 e adaptado ao **Hackathon Unicesumar** com o objetivo de conectar doadores a campanhas humanitárias e Ações Sociais. O projeto foca em Tema 01: Responsabilidade Social e Acessibilidade Digital, propondo a utilização de tecnologias de Google Cloud Computing e Inteligência Artificial para promover inclusão digital, acessibilidade e capacitação para populações vulneráveis.
@@ -166,7 +164,7 @@ Para configurar e rodar o frontend e backend do projeto Sou Solidário **localme
 
 **Limitações deste Modo de Execução:**
 
-*   **Dados Não Persistentes:** Todas as alterações e cadastros feitos na aplicação (novos usuários, campanhas, doações) serão perdidos ao parar e reiniciar o servidor.
+*   **Dados Não Persistentes:** Todas as alterações e cadastros feitos na aplicação (novos usuários, campanhas, doações) serão perdidos ao parar e reiniciar o servidor. 
 
 
 
