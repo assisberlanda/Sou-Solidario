@@ -1,120 +1,47 @@
 import express from "express";
 import { createServer } from "node:http";
-import { config } from "dotenv";
-import { createClient } from "@supabase/supabase-js";
-import { v4 as uuidv4 } from "uuid";
-import { setupVite } from "./vite"; // continua para frontend
+import { config } from "dotenv"; // Necessário para carregar SESSION_SECRET
+import { setupVite, serveStatic } from "./vite"; // Importa funções do Vite
+import { setupAuth } from "./auth"; // Importa a configuração de autenticação
+import { registerRoutes } from "./routes"; // Importa o registro de rotas principais
 
-config();
+config(); // Carrega variáveis de ambiente do arquivo .env
 
 const app = express();
-const server = createServer(app);
+const server = createServer(app); // Cria o servidor HTTP
 
+// Middleware para processar JSON no corpo das requisições
 app.use(express.json());
 
-// Supabase client
-const supabase = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_KEY!
-);
+// --- Configuração de Autenticação ---
+// Isso configura as sessões e as rotas /api/login, /api/register, /api/logout, /api/user
+setupAuth(app);
 
-// Rotas de API
-app.post("/api/empresas", async (req, res) => {
-  const {
-    nome,
-    email,
-    telefone,
-    cidade,
-    bairro,
-    campanhas,
-    imagens,
-    dias_disponiveis,
-    horarios_disponiveis,
-  } = req.body;
+// --- Registro de Rotas Principais ---
+// Isso registra as rotas /api/campaigns, /api/donations, etc.
+// Elas usarão o 'storage' que, neste modo, é a MemStorage em memória
+registerRoutes(app);
 
-  const { data, error } = await supabase.from("empresas").insert([
-    {
-      id: uuidv4(),
-      nome,
-      email,
-      telefone,
-      cidade,
-      bairro,
-      campanhas,
-      imagens,
-      dias_disponiveis,
-      horarios_disponiveis,
-    },
-  ]);
+// --- Integração com o Frontend (Vite) ---
+// Em ambiente de desenvolvimento (npm run dev), usamos o middleware do Vite.
+// Em ambiente de produção (npm run build && npm start), servimos os arquivos estáticos construídos.
+if (process.env.NODE_ENV !== "production") {
+  console.log("Modo de desenvolvimento: Usando middleware Vite");
+  setupVite(app, server); // Passa o servidor HTTP para o HMR do Vite
+} else {
+  console.log("Modo de produção: Servindo arquivos estáticos da pasta dist");
+  serveStatic(app); // Serve a pasta 'dist/public' construída pelo Vite build
+}
 
-  if (error) return res.status(500).json({ error: error.message });
+// Iniciar servidor HTTP
+const port = 5000;
+const host = "localhost"; // Geralmente localhost para desenvolvimento local
 
-  return res.json({ message: "Empresa cadastrada com sucesso", data });
-});
-
-app.post("/api/campanhas", async (req, res) => {
-  const { empresa_id, titulo, descricao, imagem, data_inicio, data_fim } = req.body;
-
-  const { data, error } = await supabase.from("campanhas").insert([
-    {
-      id: uuidv4(),
-      empresa_id,
-      titulo,
-      descricao,
-      imagem,
-      data_inicio,
-      data_fim,
-    },
-  ]);
-
-  if (error) return res.status(500).json({ error: error.message });
-
-  return res.json({ message: "Campanha cadastrada com sucesso", data });
-});
-
-app.get("/api/campanhas", async (_req, res) => {
-  const { data, error } = await supabase.from("campanhas").select("*").order("criado_em", { ascending: false });
-
-  if (error) return res.status(500).json({ error: error.message });
-
-  return res.json(data);
-});
-
-app.delete("/api/campanhas/:id", async (req, res) => {
-  const { id } = req.params;
-
-  const { error } = await supabase.from("campanhas").delete().eq("id", id);
-
-  if (error) return res.status(500).json({ error: error.message });
-
-  return res.json({ message: "Campanha excluída com sucesso" });
-});
-
-app.get("/api/admin/empresas-campanhas", async (_req, res) => {
-  const { data: empresas, error: empresasError } = await supabase
-    .from("empresas")
-    .select("id, nome, cidade, bairro");
-
-  if (empresasError) return res.status(500).json({ error: empresasError.message });
-
-  const { data: campanhas, error: campanhasError } = await supabase
-    .from("campanhas")
-    .select("id, empresa_id, titulo, descricao, imagem");
-
-  if (campanhasError) return res.status(500).json({ error: campanhasError.message });
-
-  const empresasComCampanhas = empresas.map((empresa) => ({
-    ...empresa,
-    campanhas: campanhas.filter((campanha) => campanha.empresa_id === empresa.id),
-  }));
-
-  return res.json(empresasComCampanhas);
-});
-
-// Integrar o Vite Middleware depois das rotas de API
-setupVite(app, server);
-
-// Iniciar servidor
-server.listen(5000, () => {
-  console.log("🚀 Servidor rodando em http://localhost:5000");
+server.listen(port, () => {
+  console.log(`🚀 Servidor Express rodando em http://${host}:${port}`);
+  if (process.env.NODE_ENV !== "production") {
+    console.log(`Frontend development server integrado.`);
+  } else {
+     console.log(`Servindo frontend estático.`);
+  }
 });
