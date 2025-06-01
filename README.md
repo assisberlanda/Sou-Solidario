@@ -1,8 +1,10 @@
 # 🤝 Sou Solidário
 
+Olá a todos! Meu nome é Assis Berlanda de Medeiros, estudante de Engenharia de Software na Unicesumar e motivado por um curso em Google Cloud e AI, busquei criar uma plataforma que fosse além da Responsabilidade Social e Acessibilidade Digital.
+
 ## 🎯 Visão Geral
 
-O **Sou Solidário** é uma plataforma digital responsiva concebida durante um projeto pessoal em maio de 2024 e adaptado ao **Hackathon Unicesumar** com o objetivo de conectar doadores a campanhas humanitárias e Ações Sociais. O projeto foca em Tema 01: Responsabilidade Social e Acessibilidade Digital, propondo a utilização de tecnologias de Google Cloud Computing e Inteligência Artificial para promover inclusão digital, acessibilidade e capacitação para populações vulneráveis.
+O **Sou Solidário** é uma plataforma digital responsiva concebida durante um projeto pessoal em maio de 2024 e adaptado ao **Hackathon Unicesumar** como uma resposta prática e inovadora aos desafios sociais urgentes, após a tragédia da enchente no Rio Grande do Sul [veja aqui](https://www.cnnbrasil.com.br/nacional/sul/rs/alagamentos-destruicao-e-183-mortes-relembre-a-tragedia-das-chuvas-no-rs-que-marcou-2024/), que devastou a cidade e destruiu famílias. Com o objetivo de conectar doadores à Campanhas Humanitárias e Ações Sociais. O projeto foca no Tema 01: Responsabilidade Social e Acessibilidade Digital, propondo a utilização de tecnologias de Google Cloud Computing e Inteligência Artificial para promover inclusão digital, acessibilidade e capacitação para populações vulneráveis. 
 
 ## ✨ Funcionalidades
 
