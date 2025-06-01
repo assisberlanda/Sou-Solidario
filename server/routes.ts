@@ -4,19 +4,13 @@ import express, { type Express, Request, Response } from "express";
 // Removido: import { createServer, type Server } from "http"; // Não é necessário criar o servidor aqui
 import path from "path";
 import { storage } from "./storage";
-// Sou-Solidario - cópia/server/routes.ts
-
-import express, { type Express, Request, Response } from "express";
-// Removido: import { createServer, type Server } from "http"; // Não é necessário criar o servidor aqui
-import path from "path";
-import { storage } from "./storage";
 import {
   // Importando todos os schemas e tipos necessários que agora estão exportados em shared/schema.ts
   insertCampaignSchema,
-  insertNeededItemSchema, // Agora exportado
+  insertNeededItemSchema, // Mantido pois é usado na rota POST /api/needed-items
+  // insertDonationItemSchema, // Não usado neste arquivo, pode remover a menos que adicione lógica que o use
+  // insertFinancialDonationSchema, // Não usado neste arquivo, pode remover a menos que adicione lógica que o use
   donationProcessSchema, // Usado na rota POST /api/donations
-  // insertDonationItemSchema, // Ainda não usado neste arquivo, pode remover a menos que adicione lógica que o use
-  // insertFinancialDonationSchema, // Ainda não usado neste arquivo, pode remover a menos que adicione lógica que o use
   financialDonationProcessSchema, // Usado na rota POST /api/financial-donations
   // Importando os tipos necessários para tipagem
   Campaign,
@@ -24,7 +18,7 @@ import {
   Category,
   User // Importado para tipar req.user corretamente após requireAuth
 } from "../shared/schema";
-import QRCode from "qrcode"; // Corrigiremos o erro de tipo abaixo
+import QRCode from "qrcode";
 import { z } from "zod";
 // Removido: import { setupAuth } from "./auth"; // setupAuth é chamado apenas em index.ts
 
@@ -32,26 +26,11 @@ import { z } from "zod";
 // É preferível instalar @types/qrcode (`npm install --save-dev @types/qrcode`)
 declare module 'qrcode'; // Manter esta linha como fallback
 
-// ... O restante do código do arquivo server/routes.ts que corrigimos anteriormente ...
-// (Ou cole todo o código corrigido do Passo 1 da resposta anterior)
-
-// Lembre-se de manter todas as correções anteriores que fizemos:
-// - Assinatura da função registerRoutes(app: Express): Promise<void>
-// - Asserções de tipo `const user = req.user as User;` após requireAuth
-// - Comentar ou remover as rotas /api/campaign-managers/*
-// - Verificação `if (campaign)` na rota /api/chat
-import QRCode from "qrcode";
-import { z } from "zod";
-// Removido: import { setupAuth } from "./auth"; // setupAuth é chamado apenas em index.ts
-
-// Declaração de módulo para 'qrcode' se @types/qrcode não estiver instalado ou configurado globalmente
-// É preferível instalar @types/qrcode (`npm install --save-dev @types/qrcode`)
-declare module 'qrcode';
-
 
 // A função registerRoutes agora apenas configura as rotas na instância 'app'
-export async function registerRoutes(app: Express): Promise<void> { // Corrigido o tipo de retorno
-  // Servir arquivos estáticos da pasta assets
+export async function registerRoutes(app: Express): Promise<void> { // Corrigido o tipo de retorno para Promise<void>
+  // Servir arquivos estáticos da pasta assets (apenas para imagens mock/exemplo)
+  // Se você tiver outros assets estáticos que não são tratados pelo Vite ou upload, adicione aqui
   app.use('/assets', express.static(path.join(process.cwd(), 'client/src/assets/images')));
 
   // Removido: setupAuth(app); // Isso deve ser chamado apenas uma vez em index.ts antes de montar as rotas
@@ -68,7 +47,7 @@ export async function registerRoutes(app: Express): Promise<void> { // Corrigido
 
   // Middleware para verificar se é admin
   const requireAdmin = (req: Request, res: Response, next: Function) => {
-    // req.user é garantido como definido aqui por isAuthenticated()
+    // requireAuth garante que req.user está definido aqui
     // Adicionada asserção de tipo para acesso seguro a req.user.role
     const user = req.user as User; // Asserção de tipo
     if (!user || user.role !== 'admin') {
@@ -80,6 +59,7 @@ export async function registerRoutes(app: Express): Promise<void> { // Corrigido
   // Rotas de Campanhas
   app.get("/api/campaigns", async (_req: Request, res: Response) => {
     try {
+      // storage.getCampaigns precisa ser implementado para persistência no DB
       const campaigns = await storage.getCampaigns();
       return res.json(campaigns);
     } catch (error) {
@@ -142,29 +122,84 @@ export async function registerRoutes(app: Express): Promise<void> { // Corrigido
     }
   });
 
+  // Rota POST para criar campanha (com correção de data e uniqueCode/createdBy/JSON fields)
   app.post("/api/campaigns", requireAuth, async (req: Request, res: Response) => {
     try {
       // requireAuth garante que req.user está definido
       const user = req.user as User; // Asserção de tipo
 
-       // Incluir createdBy do usuário autenticado
-      const campaignData = {
-        ...req.body,
-        createdBy: user.id // Atribui o ID do usuário logado
+       // Extrai os dados relevantes do corpo da requisição
+      const {
+          title, // Esperado pelo frontend (payload.title)
+          description, // Esperado pelo frontend (payload.description)
+          location, // Esperado pelo frontend (payload.location)
+          startDate: startDateString, // String vinda do frontend (payload.startDate)
+          endDate: endDateString,     // String vinda do frontend (payload.endDate)
+          imageUrl, // String vinda do frontend (payload.imageUrl)
+          urgent = false, // Opcional, default false
+          active = true, // Opcional, default true
+          pickupSchedule, // Objeto vindo do frontend (payload.pickupSchedule)
+          districts // Array vindo do frontend (payload.districts)
+      } = req.body;
+
+
+      // --- CORREÇÃO: Converter strings de data para objetos Date ---
+      // startDate é opcional, pode ser null. endDate é obrigatório.
+      const parsedStartDate = startDateString ? new Date(startDateString) : null; // Converter string para Date ou null
+      const parsedEndDate = new Date(endDateString); // Converter string para Date
+
+
+      // Verificar se as datas resultaram em objetos Date válidos (opcional, Zod também valida)
+      if (endDateString && isNaN(parsedEndDate.getTime())) {
+           return res.status(400).json({ message: "Data de término inválida" });
+      }
+       if (startDateString && parsedStartDate && isNaN(parsedStartDate.getTime())) {
+          return res.status(400).json({ message: "Data de início inválida" });
+       }
+
+
+      // Preparar os dados no formato esperado pelo insertCampaignSchema Zod
+      const campaignDataForValidation = {
+          title: title,
+          description: description,
+          location: location,
+          startDate: parsedStartDate, // <-- Passando objeto Date ou null
+          endDate: parsedEndDate,     // <-- Passando objeto Date
+          imageUrl: imageUrl || null, // Assegurar que é string ou null
+          active: active,
+          createdBy: user.id, // Atribui o ID do usuário logado
+          uniqueCode: Math.random().toString(36).substring(2, 8).toUpperCase(), // Gerar código único aqui no backend
+          urgent: urgent,
+          // Mapear campos JSON - storage mock serializa, então passamos o objeto/array
+          pickupSchedule: pickupSchedule || null,
+          districts: districts || [],
       };
 
-      const data = insertCampaignSchema.parse(campaignData); // Validar dados com o schema
+       console.log("Dados preparados para validação (POST /api/campaigns):", campaignDataForValidation);
+
+      // Validar os dados preparados com o insertCampaignSchema
+      // O schema espera 'Date' para startDate e endDate
+      const validatedData = insertCampaignSchema.parse(campaignDataForValidation);
+
+       console.log("Dados validados pelo Zod:", validatedData);
+
       // storage.createCampaign precisa ser implementado para persistência no DB
-      const campaign = await storage.createCampaign(data);
-      return res.status(201).json(campaign);
+      const campaign = await storage.createCampaign(validatedData); // Usar os dados validados
+      console.log("Campanha criada no storage:", campaign);
+
+      return res.status(201).json(campaign); // Retorna a campanha criada
+
     } catch (error) {
       console.error("Erro na rota POST /api/campaigns:", error); // Adicionado log
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Erro de validação", errors: error.errors }); // Retornar erros de validação Zod
+        // Retornar erros de validação Zod formatados
+        return res.status(400).json({ message: "Erro de validação", errors: error.errors });
       }
+      // Outros erros (storage, DB)
       return res.status(500).json({ message: "Erro ao criar campanha" });
     }
   });
+
 
   app.put("/api/campaigns/:id", requireAuth, async (req: Request, res: Response) => {
     try {
@@ -184,16 +219,63 @@ export async function registerRoutes(app: Express): Promise<void> { // Corrigido
              return res.status(403).json({ message: "Você não tem permissão para editar esta campanha" });
         }
 
+       // Extrair dados para atualização, incluindo a conversão de data se vierem
+       const {
+           title, description, location,
+           startDate: startDateString, endDate: endDateString,
+           imageUrl, urgent, active,
+           pickupSchedule, districts
+       } = req.body;
 
-      // Validar apenas os campos permitidos para atualização se necessário
-      // const updatedData = insertCampaignSchema.partial().parse(req.body); // Exemplo: usar partial() para permitir campos opcionais
+       // Preparar dados para atualização, convertendo datas se presentes
+       const updateData: Partial<Campaign> = {};
+        if (title !== undefined) updateData.title = title;
+        if (description !== undefined) updateData.description = description;
+        if (location !== undefined) updateData.location = location;
+        if (imageUrl !== undefined) updateData.imageUrl = imageUrl || null;
+        if (urgent !== undefined) updateData.urgent = urgent;
+        if (active !== undefined) updateData.active = active;
+        if (pickupSchedule !== undefined) updateData.pickupSchedule = pickupSchedule || null; // O storage mock vai serializar
+        if (districts !== undefined) updateData.districts = districts || []; // O storage mock vai serializar
+
+        // Converter datas SOMENTE se vierem na requisição de PUT
+        if (startDateString !== undefined) {
+             const parsedStartDate = startDateString ? new Date(startDateString) : null;
+             if (startDateString && parsedStartDate && isNaN(parsedStartDate.getTime())) {
+                 return res.status(400).json({ message: "Data de início inválida para atualização" });
+             }
+             updateData.startDate = parsedStartDate; // Passa Date ou null
+        }
+         if (endDateString !== undefined) { // endDate é obrigatório, mas pode ser enviado no PUT
+             const parsedEndDate = new Date(endDateString);
+              if (endDateString && isNaN(parsedEndDate.getTime())) {
+                 return res.status(400).json({ message: "Data de término inválida para atualização" });
+             }
+             updateData.endDate = parsedEndDate; // Passa Date
+        }
+
+
+      // Opcional: Validar os dados de atualização com insertCampaignSchema.partial() se necessário
+      // try {
+      //    insertCampaignSchema.partial().parse(updateData);
+      // } catch (zodError) {
+      //    if (zodError instanceof z.ZodError) {
+      //        return res.status(400).json({ message: "Erro de validação na atualização", errors: zodError.errors });
+      //    }
+      //    throw zodError; // Lança outros erros de validação
+      // }
+
 
       // storage.updateCampaign precisa ser implementado para persistência no DB
-      const updatedCampaign = await storage.updateCampaign(id, req.body); // Passar req.body diretamente ou dados validados
+      const updatedCampaign = await storage.updateCampaign(id, updateData); // Passar os dados preparados/validados
 
       if (!updatedCampaign) {
-        return res.status(404).json({ message: "Campanha não encontrada após atualização" }); // Mensagem mais clara
+        // Se o updateCampaign retornar undefined mesmo com ID válido e dados, pode ser um erro no storage mock
+        return res.status(500).json({ message: "Erro interno ao atualizar campanha no armazenamento" }); // Mensagem mais clara
       }
+       // Buscar a campanha atualizada do storage para garantir que os dados de retorno estão corretos (especialmente campos JSON)
+       // No mock storage, updateCampaign já retorna o objeto atualizado, então não precisa buscar de novo.
+       // Em uma implementação DB, talvez fosse necessário buscar novamente.
 
       return res.json(updatedCampaign);
     } catch (error) {
@@ -233,7 +315,7 @@ export async function registerRoutes(app: Express): Promise<void> { // Corrigido
       if (!deleted) {
         // Este caso pode ocorrer se a campanha foi encontrada, mas a exclusão no storage falhou por algum motivo
          console.error(`Falha na exclusão do storage para campanha ID ${id}.`); // Log mais específico
-        return res.status(500).json({ message: "Erro ao excluir campanha no armazenamento" });
+        return res.status(500).json({ message: "Erro ao excluir campanha no armazenamento" }); // Status mais apropriado
       }
 
       return res.json({ message: "Campanha excluída com sucesso" });
@@ -281,7 +363,7 @@ export async function registerRoutes(app: Express): Promise<void> { // Corrigido
     } catch (error) {
       console.error("Erro na rota GET /api/campaigns/:id/qrcode:", error); // Adicionado log
       // Se o erro não for de campanha não encontrada (404 já tratado), é um erro do servidor
-      if (res.statusCode !== 404) {
+      if (res.statusCode !== 404) { // Verifica se o status já foi definido para 404
          return res.status(500).json({ message: "Erro ao gerar QR Code" });
       }
        // Se já definiu status 404, apenas retorna
@@ -349,9 +431,19 @@ export async function registerRoutes(app: Express): Promise<void> { // Corrigido
        //      return res.status(403).json({ message: "Você não tem permissão para editar este item" });
        // }
 
+      // Validar apenas os campos permitidos para atualização se necessário
+      // try {
+      //     insertNeededItemSchema.partial().parse(req.body); // Exemplo: usar partial() para permitir campos opcionais
+      // } catch (zodError) {
+      //    if (zodError instanceof z.ZodError) {
+      //        return res.status(400).json({ message: "Erro de validação na atualização do item", errors: zodError.errors });
+      //    }
+      //    throw zodError;
+      // }
+
 
       // storage.updateNeededItem precisa ser implementado para persistência no DB
-      const updatedItem = await storage.updateNeededItem(id, req.body);
+      const updatedItem = await storage.updateNeededItem(id, req.body); // Passar req.body diretamente ou dados validados
 
       if (!updatedItem) {
         return res.status(404).json({ message: "Item necessário não encontrado" });
@@ -385,7 +477,7 @@ export async function registerRoutes(app: Express): Promise<void> { // Corrigido
       if (!deleted) {
         // Pode ser 404 se o item não for encontrado mesmo após a verificação de permissão (corrida?)
          console.error(`Falha na exclusão do storage para item ID ${id}.`); // Log mais específico
-         return res.status(404).json({ message: "Item não encontrado para exclusão" }); // Status mais apropriado
+        return res.status(404).json({ message: "Item não encontrado para exclusão" }); // Status mais apropriado
       }
 
       return res.json({ message: "Item excluído com sucesso" });
@@ -413,9 +505,9 @@ export async function registerRoutes(app: Express): Promise<void> { // Corrigido
           city: validatedDonationData.city,
           state: validatedDonationData.state,
           zipCode: validatedDonationData.zipCode,
-          pickupDate: validatedDonationData.pickupDate.toISOString().split('T')[0], // Converter Date para string YYYY-MM-DD
+          pickupDate: validatedDonationData.pickupDate.toISOString().split('T')[0], // Converter Date para string YYYY-MM-DD para armazenamento (depende do storage)
           pickupTime: validatedDonationData.pickupTime,
-          pickupInstructions: validatedDonationData.instructions || null, // Permitir instruções opcionais
+          pickupInstructions: validatedDonationData.pickupInstructions || null, // Permitir instruções opcionais
           status: "pending" // Status inicial
       });
 
@@ -504,7 +596,7 @@ export async function registerRoutes(app: Express): Promise<void> { // Corrigido
        }
       const { status } = req.body;
 
-      // Opcional: Validar o status recebido (ex: usando Zod enum ou lista permitida)
+      // Validar o status recebido (ex: usando Zod enum ou lista permitida)
       const allowedStatuses = ["pending", "confirmed", "scheduled", "collected", "cancelled"];
       if (!status || typeof status !== 'string' || !allowedStatuses.includes(status)) {
         return res.status(400).json({ message: "Status inválido" });
@@ -576,7 +668,8 @@ export async function registerRoutes(app: Express): Promise<void> { // Corrigido
       // Retornar os dados da doação criada (incluindo info da conta mockada para o frontend)
       return res.status(201).json({
          ...financialDonation,
-         accountInfo: JSON.parse(financialDonation.accountInfo as string) // Parse de volta para objeto no retorno
+         // TODO: Remover JSON.parse aqui se o storage mock já retornar o objeto parseado
+         accountInfo: financialDonation.accountInfo ? JSON.parse(financialDonation.accountInfo as string) : null
       });
 
     } catch (error) {
@@ -605,7 +698,7 @@ export async function registerRoutes(app: Express): Promise<void> { // Corrigido
 
       return res.json(donationsWithParsedInfo);
     } catch (error) {
-      console.error("Erro na rota GET /api/financial-donations:", error); // Adicionado log
+       console.error("Erro na rota GET /api/financial-donations:", error); // Adicionado log
       return res.status(500).json({ message: "Erro ao buscar doações financeiras" });
     }
   });
@@ -773,9 +866,4 @@ export async function registerRoutes(app: Express): Promise<void> { // Corrigido
       return res.status(500).json({ message: "Erro ao processar mensagem" });
     }
   });
-
-
-  // Removido: Essas linhas criavam/retornavam um servidor HTTP, o que é feito em index.ts agora
-  // const httpServer = createServer(app);
-  // return httpServer;
 }

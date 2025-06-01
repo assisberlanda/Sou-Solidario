@@ -226,7 +226,14 @@ Para configurar e rodar o frontend e backend do projeto Sou Solidário **localme
         npm install # ou yarn install ou pnpm install
         ```
     *   Se a instalação falhar em alguma dependência opcional (como `bufferutil`), geralmente é seguro ignorar, a menos que o projeto utilize intensivamente funcionalidades que dependem dela.
+    * Instalar a biblioteca multer
+        ```bash
+        npm install multer # OU 
+        yarn add multer # OU
+        pnpm add multer
+        npm install --save-dev @types/multer
 
+        ```
 5.  **Execute o Projeto Localmente:**
     *   Utilize o script de desenvolvimento:
         ```bash
