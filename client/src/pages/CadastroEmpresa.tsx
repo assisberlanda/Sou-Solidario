@@ -34,17 +34,44 @@ export default function CadastroEmpresa() {
   });
 
   const onSubmit = async (data: any) => {
-    const res = await fetch("/api/empresas", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
+    try {
+      console.log("Enviando dados de cadastro:", data);
+      
+      const res = await fetch("/api/empresas", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
 
-    if (res.ok) {
-      alert("Empresa cadastrada com sucesso!");
-      navigate("/cadastro-campanha");
-    } else {
-      alert("Erro ao cadastrar empresa!");
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.message || "Erro ao cadastrar empresa");
+      }
+
+      const { empresa, user } = await res.json();
+      console.log("Empresa cadastrada com sucesso:", empresa);
+      
+      // Login automático após cadastro
+      const loginRes = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: 'include',
+        body: JSON.stringify({
+          username: data.email,
+          password: data.senha
+        }),
+      });
+
+      if (loginRes.ok) {
+        console.log("Login realizado com sucesso");
+        navigate("/cadastro-campanha");
+      } else {
+        console.error("Erro no login automático");
+        navigate("/login");
+      }
+    } catch (error) {
+      console.error("Erro no cadastro:", error);
+      alert(error instanceof Error ? error.message : "Erro ao cadastrar empresa!");
     }
   };
 

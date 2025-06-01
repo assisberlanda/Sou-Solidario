@@ -3,7 +3,6 @@ import { createServer, type Server } from "http";
 import path from "path";
 import { storage } from "./storage";
 import { 
-  loginSchema, 
   insertCampaignSchema, 
   insertNeededItemSchema, 
   insertDonationSchema, 
@@ -12,99 +11,19 @@ import {
   financialDonationProcessSchema
 } from "../shared/schema"; // Adjusted the path to a relative one
 import QRCode from "qrcode";
-import session from "express-session";
-import MemoryStore from "memorystore";
 import { z } from "zod";
-
-const SessionStore = MemoryStore(session);
-
-app.get("/api/auth/me", (req: Request, res: Response) => {
-  const user = req.session.user;
-  if (!user) {
-    return res.status(401).json({ message: "Não autenticado" });
-  }
-  return res.json(user); // Aqui retorna { id, email, nome, cidade, bairro }
-});
+import { setupAuth } from "./auth";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Servir arquivos estáticos da pasta assets
   app.use('/assets', express.static(path.join(process.cwd(), 'client/src/assets/images')));
   
-  // Configuração da sessão
-  app.use(
-    session({
-      store: new SessionStore({
-        checkPeriod: 86400000, // limpar sessões expiradas a cada 24h
-      }),
-      secret: "sou-solidario-secret",
-      resave: false,
-      saveUninitialized: false,
-      cookie: { 
-        secure: false, // deveria ser true em produção com HTTPS
-        maxAge: 8 * 60 * 60 * 1000 // 8 horas
-      }
-    })
-  );
-
-  // Autenticação
-  app.post("/api/auth/login", async (req: Request, res: Response) => {
-    try {
-      const data = loginSchema.parse(req.body);
-      const user = await storage.getUserByUsername(data.username);
-      
-      if (!user || user.password !== data.password) {
-        return res.status(401).json({ message: "Credenciais inválidas" });
-      }
-      
-      // @ts-ignore
-      req.session.user = {
-        id: user.id,
-        username: user.username,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        organization: user.organization
-      };
-      
-      return res.json({
-        id: user.id,
-        username: user.username,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        organization: user.organization
-      });
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: error.errors });
-      }
-      return res.status(500).json({ message: "Erro no servidor" });
-    }
-  });
-
-  app.post("/api/auth/logout", (req: Request, res: Response) => {
-    req.session.destroy((err) => {
-      if (err) {
-        return res.status(500).json({ message: "Erro ao fazer logout" });
-      }
-      res.clearCookie("connect.sid");
-      return res.json({ message: "Logout realizado com sucesso" });
-    });
-  });
-
-  app.get("/api/auth/me", (req: Request, res: Response) => {
-    // @ts-ignore
-    const user = req.session.user;
-    if (!user) {
-      return res.status(401).json({ message: "Não autenticado" });
-    }
-    return res.json(user);
-  });
+  // Configurar autenticação com passport (sessions, etc.)
+  setupAuth(app);
 
   // Middleware de autenticação para rotas protegidas
   const requireAuth = (req: Request, res: Response, next: Function) => {
-    // @ts-ignore
-    if (!req.session.user) {
+    if (!req.isAuthenticated()) {
       return res.status(401).json({ message: "Acesso não autorizado" });
     }
     next();
@@ -112,8 +31,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Middleware para verificar se é admin
   const requireAdmin = (req: Request, res: Response, next: Function) => {
-    // @ts-ignore
-    if (!req.session.user || req.session.user.role !== 'admin') {
+    if (!req.isAuthenticated() || req.user.role !== 'admin') {
       return res.status(403).json({ message: "Acesso restrito a administradores" });
     }
     next();
@@ -126,6 +44,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.json(campaigns);
     } catch (error) {
       return res.status(500).json({ message: "Erro ao buscar campanhas" });
+    }
+  });
+  
+  app.get("/api/campaigns/my", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ message: "Não autenticado" });
+      }
+      
+      const userId = req.user.id;
+      console.log("Buscando campanhas para o usuário:", userId);
+      
+      const campaigns = await storage.getCampaignsByUserId(userId);
+      console.log("Campanhas encontradas:", campaigns);
+      
+      return res.json(campaigns);
+    } catch (error) {
+      console.error("Erro ao buscar campanhas do usuário:", error);
+      return res.status(500).json({ message: "Erro ao buscar suas campanhas" });
     }
   });
 
@@ -187,17 +124,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/campaigns/:id", requireAdmin, async (req: Request, res: Response) => {
+  app.delete("/api/campaigns/:id", requireAuth, async (req: Request, res: Response) => {
     try {
       const id = parseInt(req.params.id);
+      const userId = req.user.id;
+      
+      // Verificar se a campanha pertence ao usuário logado
+      const campaign = await storage.getCampaign(id);
+      
+      if (!campaign) {
+        return res.status(404).json({ message: "Campanha não encontrada" });
+      }
+      
+      // Se o usuário não é admin e não é dono da campanha, não pode excluir
+      if (req.user.role !== 'admin' && campaign.createdBy !== userId) {
+        return res.status(403).json({ message: "Você não tem permissão para excluir esta campanha" });
+      }
+      
       const deleted = await storage.deleteCampaign(id);
       
       if (!deleted) {
-        return res.status(404).json({ message: "Campanha não encontrada" });
+        return res.status(500).json({ message: "Erro ao excluir campanha" });
       }
       
       return res.json({ message: "Campanha excluída com sucesso" });
     } catch (error) {
+      console.error("Erro ao excluir campanha:", error);
       return res.status(500).json({ message: "Erro ao excluir campanha" });
     }
   });
@@ -615,64 +567,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  import { createClient } from "@supabase/supabase-js"; // já deve ter importado no começo
-
-const supabase = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_KEY!
-);
-
-app.post("/api/auth/login", async (req: Request, res: Response) => {
-  try {
-    const { email, password } = req.body;
-
-    if (!email || !password) {
-      return res.status(400).json({ message: "Email e senha obrigatórios." });
-    }
-
-    // Buscar empresa pelo email
-    const { data: empresas, error } = await supabase
-      .from("empresas")
-      .select("*")
-      .eq("email", email);
-
-    if (error) {
-      return res.status(500).json({ message: "Erro ao buscar empresa." });
-    }
-
-    const empresa = empresas?.[0];
-
-    if (!empresa) {
-      return res.status(401).json({ message: "Empresa não cadastrada" });
-    }
-
-    // Verificar senha (atenção: em produção usar senha com hash)
-    if (empresa.password !== password) {
-      return res.status(401).json({ message: "Email ou senha inválidos" });
-    }
-
-    // Login realizado, cria sessão
-    // @ts-ignore
-    req.session.user = {
-      id: empresa.id,
-      email: empresa.email,
-      nome: empresa.nome,
-      cidade: empresa.cidade,
-      bairro: empresa.bairro,
-    };
-
-    return res.json({
-      id: empresa.id,
-      email: empresa.email,
-      nome: empresa.nome,
-      cidade: empresa.cidade,
-      bairro: empresa.bairro,
-    });
-
-  } catch (error) {
-    return res.status(500).json({ message: "Erro no servidor" });
-  }
-});
+// Essa rota já não é mais necessária pois implementamos acima
 
   // Servir imagens da pasta de assets
   app.use("/assets", express.static(path.join(process.cwd(), "client/src/assets/images")));

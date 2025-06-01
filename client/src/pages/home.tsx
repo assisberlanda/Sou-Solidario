@@ -3,9 +3,9 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import ChatBot from "@/components/ChatBot";
+
 import { Campaign } from "@shared/schema";
-import { ArrowRight, Droplet, Home, Heart, Clock, MapPin, Search, QrCode } from "lucide-react";
+import { ArrowRight, Droplet, Home, Heart, Clock, MapPin, Search } from "lucide-react";
 import { useAuth } from "../hooks/useAuth.ts";
 
 const HomePage = () => {
@@ -15,18 +15,20 @@ const HomePage = () => {
 
   return (
     <div className="container mx-auto px-4 py-6">
+
+
       {/* Hero Section */}
-      <section className="relative rounded-xl mb-12 overflow-hidden">
+      <section className="relative rounded-xl mb-12 overflow-hidden min-h-[400px]">
         {/* Background Image */}
         <div className="absolute inset-0">
           <img 
-            src="/assets/background.jpeg" 
+            src="/src/assets/images/background.jpeg" 
             alt="Ajuda humanitária" 
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-[#1eaa70]/60"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-[#1eaa70]/70"></div>
         </div>
-        
+
         {/* Content */}
         <div className="relative z-10 max-w-3xl mx-auto text-center p-8 text-white">
           <h1 className="text-3xl md:text-4xl font-heading font-bold mb-4">
@@ -42,11 +44,7 @@ const HomePage = () => {
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
-            <Link href="/campanhas">
-              <Button variant="outline" className="bg-white/10 hover:bg-white/20 border-white/40 text-white px-6 py-3 h-auto text-base">
-                Ver Campanhas
-              </Button>
-            </Link>
+            {/*Removed Ver Campanhas button*/}
           </div>
         </div>
       </section>
@@ -151,69 +149,18 @@ const HomePage = () => {
                 )}
               </div>
 
-              <p className="text-sm text-gray-600 mb-4">
-                Você também pode acessar uma campanha diretamente pelo QR Code:
-              </p>
-              <div className="flex flex-col md:flex-row items-center gap-4">
-                <Link href="/qrcode">
-                  <Button className="flex items-center">
-                    <QrCode className="mr-2 h-4 w-4" />
-                    Escanear QR Code
-                  </Button>
-                </Link>
-                <span className="text-gray-500">ou</span>
-                <form 
-                  className="relative flex-1"
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    const input = e.currentTarget.querySelector('input');
-                    const code = input?.value.trim();
-                    if (code && code.length > 0) {
-                      window.location.href = `/doar/codigo/${code}`;
-                    }
-                  }}
-                >
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Search className="h-4 w-4 text-gray-400" />
-                  </div>
-                  <input
-                    type="text"
-                    placeholder="Digite o código da campanha (ex: A12345)"
-                    className="w-full pl-10 pr-12 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                  />
-                  <button 
-                    type="submit"
-                    className="absolute inset-y-0 right-0 px-3 text-primary hover:text-primary-dark"
-                  >
-                    <ArrowRight className="h-4 w-4" />
-                  </button>
-                </form>
-              </div>
 
-              <div className="mt-8 flex justify-end">
-                <Link href="/doar/campanha">
-                  <Button className="bg-primary hover:bg-primary-dark text-white font-medium px-6 py-2 rounded-lg transition">
-                    Continuar
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </Link>
-              </div>
             </CardContent>
           </Card>
 
-          {/* Chat Bot */}
-          <ChatBot />
+          
         </TabsContent>
 
         <TabsContent value="campanhas-ativas">
           <div className="mb-6">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-heading font-bold text-neutral-dark">Campanhas Ativas</h2>
-              <Link href="/campanhas">
-                <Button variant="outline" className="text-primary hover:text-primary-dark">
-                  Ver todas
-                </Button>
-              </Link>
+              {/*Removed Ver todas button*/}
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 gap-6">
@@ -303,7 +250,7 @@ const HomePage = () => {
               </div>
               <h3 className="text-lg font-heading font-semibold mb-2">1. Escolha uma Campanha</h3>
               <p className="text-gray-600 text-sm">
-                Navegue pelas campanhas ativas ou escaneie um QR Code para encontrar uma causa para apoiar.
+                Navegue pelas campanhas ativas.
               </p>
             </CardContent>
           </Card>
@@ -343,7 +290,7 @@ const HomePage = () => {
             className="w-full h-full object-cover"
           />
         </div>
-        
+
         <div className="relative z-10">
           <h2 className="text-2xl font-heading font-bold mb-4 text-white drop-shadow-md">
             Faça a diferença hoje mesmo!

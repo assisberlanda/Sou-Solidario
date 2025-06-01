@@ -10,41 +10,32 @@ import {
 } from "@/components/ui/sheet";
 import { Menu, LogOut, UserCircle, HandHelping } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
-import { queryClient } from "@/lib/queryClient";
+import { useAuth } from "@/hooks/use-auth";
 
 interface NavbarProps {
   user?: any;
 }
 
-const Navbar = ({ user }: NavbarProps) => {
+const Navbar = ({ user: propUser }: NavbarProps) => {
   const [location, navigate] = useLocation();
   const { toast } = useToast();
+  const { user, logoutMutation } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const handleLogout = async () => {
-    try {
-      await apiRequest("POST", "/api/auth/logout", {});
-      queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
-      toast({
-        title: "Logout realizado com sucesso",
-        description: "Você foi desconectado da sua conta.",
-      });
-      navigate("/");
-    } catch (error) {
-      toast({
-        title: "Erro ao fazer logout",
-        description: "Ocorreu um erro ao tentar desconectar da sua conta.",
-        variant: "destructive",
-      });
-    }
+  const handleLogout = () => {
+    logoutMutation.mutate();
   };
 
-  const links = [
+  const isCampaignPage = location.startsWith('/minhas-campanhas');
+  
+  const links = user ? [
+    { href: "/", label: "Início" },
+    { href: "/minhas-campanhas", label: "Minhas Campanhas" },
+    { href: "/minha-conta", label: "Minha Conta" }
+  ] : [
     { href: "/", label: "Início" },
     { href: "/sobre", label: "Sobre" },
     { href: "/campanhas", label: "Campanhas" },
-    { href: "/doar/selecionar-campanha", label: "Fazer Doação" },
   ];
 
   const isLinkActive = (href: string) => {
@@ -81,12 +72,12 @@ const Navbar = ({ user }: NavbarProps) => {
         <div className="flex items-center space-x-4">
           {user ? (
             <div className="hidden md:flex items-center space-x-4">
-              <Link href="/admin/dashboard">
+              <Link href="/minhas-campanhas">
                 <a className="text-white hover:text-accent-light font-medium transition flex items-center">
                   <UserCircle className="mr-1" size={18} />
                   <span>{user.name}</span>
-                  {/* Exibindo o nome da empresa */}
-                  {user.empresa && <span className="ml-2 text-sm text-white">({user.empresa})</span>}
+                  {/* Exibindo o nome da organização */}
+                  {user.organization && <span className="ml-2 text-sm text-white">({user.organization})</span>}
                 </a>
               </Link>
               <Button
@@ -99,7 +90,7 @@ const Navbar = ({ user }: NavbarProps) => {
               </Button>
             </div>
           ) : (
-            <Link href="/admin" className="hidden md:block">
+            <Link href="/auth" className="hidden md:block">
               <Button variant="default" className="bg-accent hover:bg-accent-dark text-neutral-dark font-accent font-semibold">
                 Entrar
               </Button>
@@ -138,12 +129,12 @@ const Navbar = ({ user }: NavbarProps) => {
                 {user ? (
                   <>
                     <SheetClose asChild>
-                      <Link href="/admin/dashboard">
+                      <Link href="/minhas-campanhas">
                         <a className="text-white hover:text-accent-light font-medium transition py-2 px-4 rounded-md flex items-center">
                           <UserCircle className="mr-1" size={18} />
                           <span>{user.name}</span>
-                          {/* Exibindo o nome da empresa */}
-                          {user.empresa && <span className="ml-2 text-sm text-white">({user.empresa})</span>}
+                          {/* Exibindo o nome da organização */}
+                          {user.organization && <span className="ml-2 text-sm text-white">({user.organization})</span>}
                         </a>
                       </Link>
                     </SheetClose>
@@ -161,7 +152,7 @@ const Navbar = ({ user }: NavbarProps) => {
                   </>
                 ) : (
                   <SheetClose asChild>
-                    <Link href="/admin">
+                    <Link href="/auth">
                       <a className="bg-accent hover:bg-accent-dark text-neutral-dark font-accent font-semibold py-2 px-4 rounded-lg transition text-center">
                         Entrar
                       </a>

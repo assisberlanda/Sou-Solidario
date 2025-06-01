@@ -115,6 +115,6 @@ app.get("/api/admin/empresas-campanhas", async (_req, res) => {
 setupVite(app, server);
 
 // Iniciar servidor
-server.listen(3000, () => {
-  console.log("🚀 Servidor rodando em http://localhost:3000");
+server.listen(5000, () => {
+  console.log("🚀 Servidor rodando em http://localhost:5000");
 });

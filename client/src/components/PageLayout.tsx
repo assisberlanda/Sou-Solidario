@@ -1,3 +1,4 @@
+
 import { ReactNode } from "react";
 import BackButton from "./BackButton";
 
@@ -7,7 +8,7 @@ interface PageLayoutProps {
   className?: string;
 }
 
-const PageLayout = ({ children, showBackButton = true, className = "" }: PageLayoutProps) => {
+export const PageLayout = ({ children, showBackButton = true, className = "" }: PageLayoutProps) => {
   return (
     <div className={`container mx-auto px-4 py-6 ${className}`}>
       {showBackButton && (

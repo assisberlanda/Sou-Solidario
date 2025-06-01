@@ -11,6 +11,7 @@ export default function CadastroEmpresa() {
     imagens: "",
     dias_disponiveis: "",
     horarios_disponiveis: "",
+    senha: "" // Added password field
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -30,9 +31,10 @@ export default function CadastroEmpresa() {
       horarios_disponiveis: form.horarios_disponiveis
         .split(",")
         .map((item) => item.trim()),
+      role: 'empresa' // Explicitly setting the role
     };
 
-    const res = await fetch("/api/empresas", {
+    const res = await fetch("/api/users", { // Assumed API endpoint for user creation
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -50,6 +52,7 @@ export default function CadastroEmpresa() {
         imagens: "",
         dias_disponiveis: "",
         horarios_disponiveis: "",
+        senha: "" // Clear password field
       });
     } else {
       alert("Erro ao cadastrar empresa!");
@@ -121,6 +124,14 @@ export default function CadastroEmpresa() {
         onChange={handleChange}
         className="border p-2 w-full"
       />
+      <input
+        type="password"
+        name="senha"
+        placeholder="Senha"
+        value={form.senha}
+        onChange={handleChange}
+        className="border p-2 w-full"
+      /> {/* Added password input field */}
       <button
         type="submit"
         className="bg-blue-500 text-white px-4 py-2 rounded"

@@ -1,7 +1,10 @@
 import { useState, useEffect } from "react";
 import { Switch, Route, useLocation } from "wouter";
-import { useQuery } from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
 
+import { AuthProvider, useAuth } from "@/hooks/use-auth";
+import { ProtectedRoute } from "@/lib/protected-route";
+import { queryClient } from "@/lib/queryClient";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import PageLayout from "@/components/PageLayout";
@@ -24,20 +27,17 @@ import Login from "@/pages/login/Login";
 import CadastroEmpresa from "@/pages/CadastroEmpresa";
 import CadastroCampanha from "@/pages/CadastroCampanha";
 import MinhasCampanhas from "@/pages/MinhasCampanhas";
+import EditarCampanha from "@/pages/EditarCampanha";
+import MinhaConta from "@/pages/MinhaConta";
 import Dashboard from "@/pages/Dashboard";
 import NotFound from "@/pages/not-found";
 import AboutPage from "@/pages/about";
+import AuthPage from "@/pages/auth-page";
 
-function App() {
+function AppContent() {
   const [location, navigate] = useLocation();
   const isAdminRoute = location.startsWith("/admin");
-
-  const { data: user } = useQuery({
-    queryKey: ["/api/auth/me"],
-    retry: false,
-    refetchOnWindowFocus: false,
-    refetchOnMount: false,
-  });
+  const { user } = useAuth();
 
   const [donationState, setDonationState] = useState<{
     campaignId?: number;
@@ -77,6 +77,11 @@ function App() {
             </PageLayout>
           </Route>
 
+          {/* Autenticação */}
+          <Route path="/auth">
+            <AuthPage />
+          </Route>
+
           {/* Cadastro Empresa */}
           <Route path="/cadastro-empresa">
             <PageLayout>
@@ -85,29 +90,25 @@ function App() {
           </Route>
 
           {/* Cadastro Campanha */}
-          <Route path="/cadastro-campanha">
+          <ProtectedRoute path="/cadastro-campanha" component={() => (
             <PageLayout>
               <CadastroCampanha />
             </PageLayout>
-          </Route>
+          )} />
 
           {/* Minhas Campanhas */}
-          <Route path="/minhas-campanhas">
+          <ProtectedRoute path="/minhas-campanhas" component={() => (
             <PageLayout showBackButton>
               <MinhasCampanhas />
             </PageLayout>
-          </Route>
+          )} />
 
           {/* Área Administrativa */}
-          <Route path="/admin">
-            {!user ? (
-              <Login />
-            ) : (
-              <PageLayout>
-                <Dashboard />
-              </PageLayout>
-            )}
-          </Route>
+          <ProtectedRoute path="/admin" component={() => (
+            <PageLayout>
+              <Dashboard />
+            </PageLayout>
+          )} />
 
           {/* Listagem de Campanhas Públicas */}
           <Route path="/campanhas">
@@ -296,6 +297,20 @@ function App() {
             </PageLayout>
           </Route>
 
+          {/* Minha Conta */}
+          <ProtectedRoute path="/minha-conta" component={() => (
+            <PageLayout>
+              <MinhaConta />
+            </PageLayout>
+          )} />
+          
+          {/* Editar Campanha */}
+          <ProtectedRoute path="/editar-campanha/:id" component={() => (
+            <PageLayout>
+              <EditarCampanha />
+            </PageLayout>
+          )} />
+          
           {/* Página 404 */}
           <Route>
             <PageLayout>
@@ -307,6 +322,14 @@ function App() {
 
       {!isAdminRoute && <Footer />}
     </div>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }
 

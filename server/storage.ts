@@ -7,6 +7,10 @@ import {
   donationItems, type DonationItem, type InsertDonationItem,
   financialDonations, type FinancialDonation, type InsertFinancialDonation
 } from "@shared/schema";
+import * as session from "express-session";
+import createMemoryStore from "memorystore";
+
+const MemoryStore = createMemoryStore(session);
 
 // Added interfaces for campaign manager and bank account
 interface CampaignManager {
@@ -28,10 +32,14 @@ interface BankAccount {
 
 
 export interface IStorage {
+  sessionStore: session.SessionStore;
   // Users
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  updateUser(id: number, userData: Partial<User>): Promise<User | undefined>;
+  deleteUser(id: number): Promise<boolean>;
+  getCampaignsByUserId(userId: number): Promise<Campaign[]>;
 
   // Campaigns
   getCampaigns(): Promise<Campaign[]>;
@@ -88,6 +96,7 @@ export class MemStorage implements IStorage {
   private campaignManagers: Map<number, CampaignManager>; // Added
   private bankAccounts: Map<number, BankAccount>;       // Added
   private lastIds: { [key: string]: number };
+  public sessionStore: session.SessionStore;
 
   constructor() {
     this.users = new Map();
@@ -99,6 +108,9 @@ export class MemStorage implements IStorage {
     this.financialDonations = new Map();
     this.campaignManagers = new Map(); // Added
     this.bankAccounts = new Map();       // Added
+    this.sessionStore = new MemoryStore({
+      checkPeriod: 86400000, // 24 horas (limpar sessões expiradas)
+    });
     this.lastIds = {
       users: 0,
       campaigns: 0,
@@ -246,12 +258,42 @@ export class MemStorage implements IStorage {
     );
   }
 
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    return Array.from(this.users.values()).find(
+      (user) => user.email === email,
+    );
+  }
+
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = this.getNextId("users");
     const timestamp = new Date();
     const user: User = { ...insertUser, id, createdAt: timestamp };
     this.users.set(id, user);
     return user;
+  }
+  
+  async updateUser(id: number, userData: Partial<User>): Promise<User | undefined> {
+    const user = this.users.get(id);
+    if (!user) return undefined;
+    
+    const updatedUser = { ...user, ...userData };
+    this.users.set(id, updatedUser);
+    return updatedUser;
+  }
+  
+  async deleteUser(id: number): Promise<boolean> {
+    // Primeiro verificar e excluir todas as campanhas desse usuário
+    const campaigns = await this.getCampaignsByUserId(id);
+    for (const campaign of campaigns) {
+      await this.deleteCampaign(campaign.id);
+    }
+    
+    return this.users.delete(id);
+  }
+  
+  async getCampaignsByUserId(userId: number): Promise<Campaign[]> {
+    return Array.from(this.campaigns.values())
+      .filter(campaign => campaign.createdBy === userId);
   }
 
   // Campaigns

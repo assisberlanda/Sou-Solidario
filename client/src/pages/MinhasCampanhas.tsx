@@ -1,92 +1,115 @@
-import { useEffect, useState } from "react";
-import { useLocation } from "wouter";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 
-interface Campanha {
-  id: string;
+import { useState } from "react";
+import { useLocation } from "wouter";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Plus } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { useQuery } from "@tanstack/react-query";
+
+interface Campaign {
+  id: number;
   titulo: string;
-  descricao?: string;
-  imagens?: string[]; // Corrigido para aceitar imagens como array de string
+  descricao: string;
+  imagens: string[];
+  data_inicio: string;
+  data_fim: string;
 }
 
 export default function MinhasCampanhas() {
   const [, navigate] = useLocation();
-  const [campanhas, setCampanhas] = useState<Campanha[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
-  useEffect(() => {
-    carregarMinhasCampanhas();
-  }, []);
+  const { data: campaigns, isLoading } = useQuery<Campaign[]>({
+    queryKey: ["/api/campaigns/my"],
+    onError: (error) => {
+      console.error("Erro ao carregar campanhas:", error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível carregar suas campanhas",
+        variant: "destructive",
+      });
+    },
+  });
 
-  async function carregarMinhasCampanhas() {
-    setLoading(true);
+  const handleDeleteCampaign = async (id: number) => {
+    if (!window.confirm("Tem certeza que deseja excluir esta campanha?")) {
+      return;
+    }
+
     try {
-      const res = await fetch("/api/minhas-campanhas");
-      if (res.ok) {
-        const data = await res.json();
-        setCampanhas(data);
-      } else {
-        alert("Erro ao carregar campanhas");
-      }
+      const response = await fetch(`/api/campaigns/${id}`, {
+        method: "DELETE",
+      });
+      
+      if (!response.ok) throw new Error("Erro ao excluir campanha");
+      
+      toast({
+        title: "Sucesso",
+        description: "Campanha excluída com sucesso",
+      });
+      
+      // Refresh the page to update the campaign list
+      window.location.reload();
     } catch (error) {
-      alert("Erro ao carregar campanhas");
+      toast({
+        title: "Erro",
+        description: "Erro ao excluir campanha",
+        variant: "destructive",
+      });
     }
-    setLoading(false);
-  }
-
-  async function excluirCampanha(id: string) {
-    const confirmar = confirm("Tem certeza que deseja excluir esta campanha?");
-    if (!confirmar) return;
-
-    const res = await fetch(`/api/campanhas/${id}`, {
-      method: "DELETE",
-    });
-
-    if (res.ok) {
-      alert("Campanha excluída com sucesso!");
-      carregarMinhasCampanhas(); // Atualiza a lista depois de excluir
-    } else {
-      alert("Erro ao excluir a campanha!");
-    }
-  }
-
-  if (loading) {
-    return <p>Carregando campanhas...</p>;
-  }
+  };
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex justify-between items-center mb-6">
+    <div className="container mx-auto px-4 py-6">
+      <div className="mb-6">
         <h1 className="text-3xl font-bold">Minhas Campanhas</h1>
-        <Button onClick={() => navigate("/cadastro-campanha")}>
-          Nova Campanha
-        </Button>
       </div>
 
-      {campanhas.length === 0 ? (
-        <p className="text-center text-gray-500">Nenhuma campanha cadastrada ainda.</p>
+      {isLoading ? (
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        </div>
+      ) : !campaigns || campaigns.length === 0 ? (
+        <Card className="text-center p-8">
+          <CardContent>
+            <p className="text-xl text-gray-600 mb-4">Nenhuma campanha cadastrada</p>
+            <Button 
+              onClick={() => navigate("/cadastro-campanha")}
+              className="bg-primary hover:bg-primary-dark"
+            >
+              <Plus className="h-4 w-4 mr-2" /> Adicionar Campanha
+            </Button>
+          </CardContent>
+        </Card>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {campanhas.map((campanha) => (
-            <Card key={campanha.id}>
-              <CardContent className="p-4 space-y-4">
-                {/* Exibe a imagem da campanha, se existir */}
-                {campanha.imagens && campanha.imagens.length > 0 && (
-                  <img
-                    src={campanha.imagens[0]}
-                    alt="Imagem da campanha"
-                    className="w-full h-48 object-cover rounded"
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {campaigns.map((campaign) => (
+            <Card key={campaign.id} className="overflow-hidden">
+              {campaign.imagens?.[0] && (
+                <div className="h-48 overflow-hidden">
+                  <img 
+                    src={campaign.imagens[0]} 
+                    alt={campaign.titulo}
+                    className="w-full h-full object-cover"
                   />
-                )}
-                <h2 className="text-xl font-bold">{campanha.titulo}</h2>
-                {campanha.descricao && (
-                  <p className="text-gray-700">{campanha.descricao}</p>
-                )}
+                </div>
+              )}
+              <CardContent className="p-4">
+                <h3 className="text-xl font-semibold mb-2">{campaign.titulo}</h3>
+                <p className="text-gray-600 mb-4 line-clamp-2">{campaign.descricao}</p>
                 <div className="flex gap-2">
-                  <Button
+                  <Button 
+                    variant="outline" 
+                    onClick={() => navigate(`/editar-campanha/${campaign.id}`)}
+                    className="flex-1"
+                  >
+                    Editar
+                  </Button>
+                  <Button 
                     variant="destructive"
-                    onClick={() => excluirCampanha(campanha.id)}
+                    onClick={() => handleDeleteCampaign(campaign.id)}
+                    className="flex-1"
                   >
                     Excluir
                   </Button>
