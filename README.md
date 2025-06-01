@@ -43,7 +43,7 @@ A plataforma Sou Solidário oferece diversas funcionalidades, abordando diferent
 -   **Framework:** React
 -   **Routing:** Wouter
 -   **State Management/Data Fetching:** TanStack Query
--   **UI Components:** Shadcn UI (built on Radix UI)
+-   **UI Components:** Shadcn UI (desenvolvido com Radix UI)
 -   **Styling:** Tailwind CSS (`tailwindcss-animate`, `@tailwindcss/typography`)
 -   **Animations:** Framer Motion
 -   **Date Handling:** date-fns, React Day Picker
@@ -55,20 +55,20 @@ A plataforma Sou Solidário oferece diversas funcionalidades, abordando diferent
 
 **Backend:**
 -   **Framework:** Express
--   **Authentication:** Passport.js (Local Strategy), `crypto` (for password hashing)
--   **Session Management:** express-session, memorystore (in-memory session store)
--   **Database (Planned/Configured):** PostgreSQL (implied by Drizzle config), Neon Database (@neondatabase/serverless)
+-   **Authentication:** Passport.js (Estratégia Local), `crypto` (para hash de senha)
+-   **Session Management:** express-session, memorystore (armazenamento de sessão na memória)
+-   **Database (Planned/Configured):** PostgreSQL (implícito na configuração do Drizzle), Neon Database (@neondatabase/serverless) # Não usado no Localhost
 -   **ORM (Planned/Configured):** Drizzle ORM (`drizzle-kit`, `drizzle-zod`)
 -   **Environment Variables:** dotenv
 -   **Utilities:** uuid, qrcode
--   **API Interaction (partial):** Supabase JS (used directly in some routes in `server/index.ts`)
--   **WebSockets (implied by dependency):** ws (likely for real-time features, though not explicitly shown in the provided server logic)
+-   **API Interaction (parcial):** Supabase JS (usado diretamente em algumas rotas em `server/index.ts`, para uso futuro)
+-   **WebSockets (implícito pela dependência):** ws (provavelmente para recursos em tempo real, embora não explicitamente mostrado na lógica do servidor fornecida)
 
-**Build & Development Tools:**
+**Ferramentas de construção e desenvolvimento:**
 -   TypeScript
 -   Vite (@vitejs/plugin-react, @replit/vite-plugin-shadcn-theme-json, @replit/vite-plugin-cartographer, @replit/vite-plugin-runtime-error-modal)
--   tsx (for running TypeScript files directly)
--   esbuild (for backend bundling)
+-   tsx (para executar arquivos TypeScript diretamente)
+-   esbuild (para empacotamento de backend)
 -   autoprefixer, postcss
 
 ## 📈 Impacto Social Esperado
