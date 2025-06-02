@@ -12,12 +12,26 @@ A plataforma Sou Solidário oferece diversas funcionalidades, abordando diferent
 
 ### 🌐 Core
 - Cadastro e login de usuários (Incluindo roles como 'empresa' e 'admin').
-- Criação, listagem e gerenciamento de campanhas solidárias (incluindo campos como título, descrição, localização, datas, urgência e imagens).
+- Criação, listagem e gerenciamento de campanhas solidárias (incluindo campos como título, descrição, localização, datas, urgência, quantidade de vagas e imagens).
 - Criação, listagem e gerenciamento de Itens Necessários por campanha, com prioridade e quantidade.
 - Geração de QR Codes únicos para campanhas, facilitando o compartilhamento e a doação direcionada.
-- Registro e visualização de doações materiais (itens e quantidades) com detalhes do doador e agendamento de coleta/entrega.
+- Registro e visualização de doações materiais (itens e quantidades) com detalhes do doador e agendamento de coleta/entrega ou prazo para inscrição.
 - Registro e visualização de doações financeiras (com detalhes sobre métodos de pagamento e conta/chave PIX).
 - Interface totalmente responsiva para diversos dispositivos (desktops, tablets, smartphones).
+
+### 🎗️ Responsabilidade Social
+- Mapeamento centralizado de demandas: plataformas online com lista de itens prioritários por região.
+- Doações financeiras transparentes: via Pix ou plataformas seguras, permitindo compras locais mais rápidas.
+- Doadores como redes de supermercados e farmácias: para montar kits pré-prontos entregues diretamente.
+- Voluntários com logística profissional: caminhoneiros, empresas de transporte, Defesa Civil.
+
+### 💡 Soluções de médio/longo prazo:
+- Aplicativos de gestão de doações como o app "Sou Solidário"
+- Cadastro de doadores e vítimas
+- Geolocalização de áreas afetadas
+- Integração com ONGs e prefeituras
+- Centros permanentes de ajuda humanitária: para armazenar e gerenciar estoques de emergência.
+- Educação sobre doações eficazes: campanhas orientando o que doar, quando e como.
 
 ### 📚 Educação Solidária
 - Empresas e instituições podem doar vagas em cursos gratuitos como forma de contribuição.
@@ -126,12 +140,7 @@ Para configurar e rodar o projeto Sou Solidário localmente, siga os passos abai
 *   Node.js (versão 18 ou superior é recomendada com base nos `engines` de algumas dependências) e npm (ou yarn/pnpm).
 *   Git (para clonar o repositório, se aplicável, embora você tenha um arquivo zip).
 
-
-## 💻 Configuração e Execução Local (Modo em Memória)
-
-Para configurar e rodar o frontend e backend do projeto Sou Solidário **localmente, utilizando armazenamento em memória (não persistente)**, siga os passos abaixo. Este modo é ideal para testes rápidos e visualização do aplicativo sem a necessidade de configurar um banco de dados externo.
-
-**Atenção:** Neste modo, todos os dados (usuários, campanhas, doações, etc.) serão armazenados apenas na memória enquanto o servidor estiver rodando. **Os dados serão perdidos ao encerrar o servidor.**
+O Projeto projeto Sou Solidário aqui, foi desenvolvido para ser configurado e rodar o frontend e backend **localmente para teste, utilizando armazenamento em memória (não persistente)**. Siga os passos abaixo. Este modo é ideal para testes rápidos e visualização do aplicativo sem a necessidade de configurar um banco de dados externo.
 
 **Passo a Passo:**
 
@@ -142,7 +151,7 @@ Para configurar e rodar o frontend e backend do projeto Sou Solidário **localme
         ```bash
         unzip Sou-Solidario.zip -d ./sou-solidario
         ```
-    *   Navegue até o diretório que contém o `package.json`. Provavelmente será uma subpasta após a extração do zip.
+    *   Navegue até o diretório do projeto que contém o `package.json`. Provavelmente será uma subpasta após a extração do zip.
         ```bash
         cd ./sou-solidario-project/Sou-Solidario # Ajuste o caminho se necessário
         ```
@@ -152,24 +161,24 @@ Para configurar e rodar o frontend e backend do projeto Sou Solidário **localme
         ```bash
         npm install # ou yarn install ou pnpm install
         ```
-    * Instalar a biblioteca multer
+    * Instalar a biblioteca multer para salvar os arquivos temporáriamente na memória enquanto a aplicação estiver rodando.
         ```bash
-        npm install multer # OU 
-        yarn add multer # OU
-        pnpm add multer
+        npm install multer
         npm install --save-dev @types/multer
+        ```
 
 3. **Execute o Projeto:**
     *   Utilize o script de desenvolvimento, que iniciará o servidor backend e o servidor de desenvolvimento do frontend (Vite):
         ```bash
-        npm run dev # ou yarn dev ou pnpm dev
+        npm run dev
         ```
-    *   O terminal mostrará mensagens indicando que o servidor Express e o servidor Vite estão iniciando. Ele informará o endereço local onde a aplicação estará disponível (geralmente `http://localhost:5000`).
+    *   O terminal mostrará mensagens indicando que o servidor Express e o servidor Vite estão iniciando. Ele informará o endereço local onde a aplicação estará disponível em `http://localhost:5000`.
   
 4.  **Acesse a Aplicação:**
     *   Abra seu navegador e acesse o endereço fornecido no terminal (ex: `http://localhost:5000`).
+    *   Ou abra em uma nova aba [Este Link](http://localhost:5000)
     *   A aplicação frontend será carregada, e as chamadas para a API (`/api/...`) serão processadas pelo servidor Express que está rodando localmente, utilizando os dados armazenados temporariamente na memória.
 
 **Limitações deste Modo de Execução:**
-
-*   **Dados Não Persistentes:** Todas as alterações e cadastros feitos na aplicação (novos usuários, campanhas, doações) serão perdidos ao parar e reiniciar o servidor. 
+---
+### ⚠️ Atenção - Dados Não Persistentes: Todas as alterações e cadastros feitos na aplicação (novos usuários, campanhas, doações, etc), serão perdidos ao parar e reiniciar o servido pois serão armazenados apenas na memória enquanto o servidor estiver rodando. Os dados serão perdidos ao encerrar o servidor. Pois projeto Original será configurado para permanência dos dados em Banco de Dados posteriormente. 
