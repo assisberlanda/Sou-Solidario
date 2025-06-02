@@ -177,8 +177,8 @@ export class MemStorage implements IStorage {
     });
 
     this.createCampaign({
-      title: "Reconstrução em Petrópolis",
-      description: "Apoio às famílias afetadas pelos deslizamentos em Petrópolis. Materiais de construção e itens básicos.",
+      title: "Curso Gratuito para a Terceira Idade conectar-se ao Mundo",
+      description: "Oferecemos um curso prático de como usar a internet e redes sociais, especialmente para a terceira idade da comunidade de Petrópolis! Aprenda a se conectar com familiares, amigos e o mundo digital. São 30 vagas! Não perca essa oportunidade de expandir seus horizontes online. Inscreva-se já e descubra um novo mundo de possibilidades!",
       location: "Rio de Janeiro",
       endDate: "2023-09-15",
       createdBy: 1,
