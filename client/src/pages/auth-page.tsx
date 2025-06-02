@@ -242,7 +242,7 @@ export default function AuthPage() {
           <h2 className="text-xl font-medium mb-4">Conectando quem quer ajudar a quem precisa</h2>
           <p className="mb-6">
             A plataforma Sou Solidário conecta doadores a campanhas de socorro em desastres e causas sociais.
-            Faça a diferença na vida de quem precisa com doações físicas ou financeiras.
+            Faça a diferença na vida de quem precisa com doações físicas, educacional ou financeiras.
           </p>
           <ul className="space-y-2">
             <li className="flex items-center">
@@ -251,7 +251,7 @@ export default function AuthPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              Apoie causas humanitárias
+              Apoie a Educação Solidária e a Acessibilidade Digital
             </li>
             <li className="flex items-center">
               <div className="rounded-full bg-white/20 p-1 mr-2">
@@ -259,7 +259,15 @@ export default function AuthPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              Doe itens ou valores financeiros
+              Contribua em causas humanitárias
+            </li>
+            <li className="flex items-center">
+              <div className="rounded-full bg-white/20 p-1 mr-2">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              Doe itens ou valores financeiros 
             </li>
             <li className="flex items-center">
               <div className="rounded-full bg-white/20 p-1 mr-2">

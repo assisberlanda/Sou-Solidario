@@ -49,12 +49,16 @@ const Navbar = (/* Removido prop user */) => {
   };
 
   return (
-    // --- CORREÇÃO 2: Aumentar z-index para z-[50] ---
+    // --- CORREÇÃO 2: Aumentar z-index para z-[50] --- <HandHelping className="text-white mr-2" size={24} /> linha 57
     <header className="bg-primary shadow-md fixed top-0 w-full z-[50]">
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
         <Link href="/">
           <a className="flex items-center">
-            <HandHelping className="text-white mr-2" size={24} />
+            <img
+              src="/assets/Maos.png" // <-- Substitua pelo caminho e nome do seu arquivo
+              alt="Logo Sou Solidário"
+              className="h-8 w-auto mr-2" // <-- Ajuste o tamanho conforme necessário
+            />
             <h1 className="text-white text-xl font-heading font-bold">Sou Solidário</h1>
           </a>
         </Link>

@@ -111,7 +111,7 @@ export default function ListarCampanhas() {
              return (
                <Card key={campaign.id} className="overflow-hidden shadow-sm hover:shadow-md transition">
                  {/* Área do Carrossel/Imagem */}
-                 <div className="relative bg-gray-100 h-48"> {/* Container relativo para posicionar botões do carrossel */}
+                 <div className="relative bg-gray-100 h-48 mb-4"> {/* Container relativo para posicionar botões do carrossel */}
                     {imageUrls.length > 0 ? (
                        // --- Adicionar Carrossel ---
                        <Carousel className="w-full h-full"> {/* O carrossel ocupa todo o espaço do container */}

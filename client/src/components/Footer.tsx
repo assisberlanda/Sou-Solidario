@@ -17,7 +17,11 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
             <div className="flex items-center mb-4">
-              <HandHelping className="text-accent mr-2" size={24} />
+              <img
+              src="/assets/Maos.png" // <-- Substitua pelo caminho e nome do seu arquivo
+              alt="Logo Sou Solidário"
+              className="h-8 w-auto mr-2" // <-- Ajuste o tamanho conforme necessário
+              />
               <h3 className="text-lg font-heading font-bold text-[#ffb74d]">Sou Solidário</h3>
             </div>
             <p className="text-[#ffcc80] text-sm">

@@ -59,7 +59,7 @@ const HomePage = () => {
     <div className="container mx-auto px-4 py-6">
 
       {/* Hero Section */}
-       <section className="relative rounded-xl mb-12 overflow-hidden min-h-[400px]">
+       <section className="relative rounded-xl mb-12 overflow-hidden min-h-[100px]">
         {/* Background Image */}
         <div className="absolute inset-0">
           {/* Caminho da imagem de background - verificar se está correto */}
@@ -78,7 +78,7 @@ const HomePage = () => {
             Ajude quem mais precisa em momentos de crise
           </h1>
           <p className="text-lg mb-8 text-white/90">
-            A plataforma Sou Solidário conecta pessoas que desejam ajudar com vítimas de desastres naturais e situações de emergência.
+            A plataforma Sou Solidário conecta pessoas que desejam ajudar com vítimas de desastres naturais em situações de emergência ou inclusão digital.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             {/* Link para iniciar o processo de doação */}
@@ -256,7 +256,7 @@ const HomePage = () => {
                     <Link key={campaign.id} href={`/campanha/${campaign.id}`}>
                       <Card className="overflow-hidden shadow-sm hover:shadow-md transition cursor-pointer">
                         {/* Área do Carrossel/Imagem */}
-                         <div className="relative bg-gray-100 h-40"> {/* Container relativo */}
+                         <div className="relative bg-gray-100 h-40 mb-12"> {/* Container relativo */}
                             {imageUrls.length > 0 ? (
                                <Carousel className="w-full h-full"> {/* Carrossel ocupa todo o espaço */}
                                    <CarouselContent className="h-full"> {/* Conteúdo ocupa toda a altura */}
@@ -389,7 +389,7 @@ const HomePage = () => {
             Faça a diferença hoje mesmo!
           </h2>
           <p className="max-w-2xl mx-auto mb-6 text-white drop-shadow-md">
-            Sua doação pode transformar a vida de pessoas afetadas por desastres naturais e emergências.
+            Sua doação pode transformar a vida de pessoas afetadas por desastres naturais,  emergências ou permitir que uma pessoa tenha um impacto social com a acessibilidade digital.
             Não importa o tamanho da sua contribuição, cada item doado tem um impacto significativo.
           </p>
           <Link href="/campanhas">
