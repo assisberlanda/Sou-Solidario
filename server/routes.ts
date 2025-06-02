@@ -1,95 +1,102 @@
 // Sou-Solidario - cópia/server/routes.ts
+// Definições das rotas da API (exceto autenticação)
 
 import express, { type Express, Request, Response } from "express";
-// Removido: import { createServer, type Server } from "http"; // Não é necessário criar o servidor aqui
 import path from "path";
-import { storage } from "./storage";
+import { storage } from "./storage"; // Importa a instância da MemStorage
+
 import {
-  // Importando todos os schemas e tipos necessários que agora estão exportados em shared/schema.ts
+  // Importando schemas Zod para validação
   insertCampaignSchema,
-  insertNeededItemSchema, // Mantido pois é usado na rota POST /api/needed-items
-  // insertDonationItemSchema, // Não usado neste arquivo, pode remover a menos que adicione lógica que o use
-  // insertFinancialDonationSchema, // Não usado neste arquivo, pode remover a menos que adicione lógica que o use
-  donationProcessSchema, // Usado na rota POST /api/donations
-  financialDonationProcessSchema, // Usado na rota POST /api/financial-donations
-  // Importando os tipos necessários para tipagem
-  Campaign,
-  NeededItem,
-  Category,
-  User // Importado para tipar req.user corretamente após requireAuth
+  insertNeededItemSchema,
+  donationProcessSchema,
+  financialDonationProcessSchema,
+  // Importando tipos para tipagem
+  type Campaign,
+  type NeededItem,
+  type Category,
+  type User // Necessário para tipar req.user
 } from "../shared/schema";
-import QRCode from "qrcode";
-import { z } from "zod";
-// Removido: import { setupAuth } from "./auth"; // setupAuth é chamado apenas em index.ts
 
-// Declaração de módulo para 'qrcode' se @types/qrcode não estiver instalado ou configurado globalmente
-// É preferível instalar @types/qrcode (`npm install --save-dev @types/qrcode`)
-declare module 'qrcode'; // Manter esta linha como fallback
+import QRCode from "qrcode"; // Para gerar QR Codes
+import { z } from "zod"; // Para validação Zod
 
 
-// A função registerRoutes agora apenas configura as rotas na instância 'app'
-export async function registerRoutes(app: Express): Promise<void> { // Corrigido o tipo de retorno para Promise<void>
-  // Servir arquivos estáticos da pasta assets (apenas para imagens mock/exemplo)
-  // Se você tiver outros assets estáticos que não são tratados pelo Vite ou upload, adicione aqui
+// Declaração de módulo para 'qrcode' se @types/qrcode não estiver instalado
+declare module 'qrcode';
+
+
+// A função registerRoutes configura as rotas na instância 'app' do Express
+export async function registerRoutes(app: Express): Promise<void> { // Tipo de retorno Promise<void>
+
+  // Servir arquivos estáticos da pasta assets (para imagens de exemplo iniciais)
+  // Se o frontend estiver servindo /assets via Vite, esta linha pode ser redundante em dev
   app.use('/assets', express.static(path.join(process.cwd(), 'client/src/assets/images')));
 
-  // Removido: setupAuth(app); // Isso deve ser chamado apenas uma vez em index.ts antes de montar as rotas
-
-  // Middleware de autenticação para rotas protegidas
+  // Os middlewares requireAuth e requireAdmin são definidos aqui, pois são usados por várias rotas neste arquivo
+  // Note que eles DEPENDEM de setupAuth ter sido chamado ANTES em index.ts para configurar Passport e sessão
   const requireAuth = (req: Request, res: Response, next: Function) => {
     if (!req.isAuthenticated()) {
       // Usar status 401 para não autenticado
       return res.status(401).json({ message: "Acesso não autorizado. Faça login para continuar." });
     }
-    // req.user é garantido como definido aqui por isAuthenticated()
-    next();
+    next(); // Se autenticado, continua para o próximo middleware/manipulador de rota
   };
 
-  // Middleware para verificar se é admin
   const requireAdmin = (req: Request, res: Response, next: Function) => {
-    // requireAuth garante que req.user está definido aqui
-    // Adicionada asserção de tipo para acesso seguro a req.user.role
-    const user = req.user as User; // Asserção de tipo
+    // req.user é garantido como definido por requireAuth (que deve ser usado antes)
+    // Asserção de tipo para acesso seguro a req.user.role
+    const user = req.user as User;
     if (!user || user.role !== 'admin') {
       return res.status(403).json({ message: "Acesso restrito a administradores." });
     }
-    next();
+    next(); // Se admin, continua
   };
 
-  // Rotas de Campanhas
+
+  // --- Rotas de Campanhas ---
+
+  // GET /api/campaigns: Lista todas as campanhas ativas (ou todas)
   app.get("/api/campaigns", async (_req: Request, res: Response) => {
     try {
-      // storage.getCampaigns precisa ser implementado para persistência no DB
+      // Usa o método do storage em memória
+      // O frontend em home.tsx e ListarCampanhas.tsx filtra por `active: true`
       const campaigns = await storage.getCampaigns();
       return res.json(campaigns);
     } catch (error) {
-      console.error("Erro na rota GET /api/campaigns:", error); // Adicionado log
+      console.error("Erro na rota GET /api/campaigns:", error);
       return res.status(500).json({ message: "Erro ao buscar campanhas" });
     }
   });
 
+  // GET /api/campaigns/my: Lista campanhas criadas pelo usuário logado
   app.get("/api/campaigns/my", requireAuth, async (req: Request, res: Response) => {
     try {
       // requireAuth garante que req.user está definido
-      const user = req.user as User; // Asserção de tipo
+      const user = req.user as User; // Asserção de tipo para acesso seguro
 
-      const userId = user.id; // Acessa user.id de forma segura
+      const userId = user.id; // Obtém o ID do usuário logado
       console.log("Buscando campanhas para o usuário:", userId);
 
-      // storage.getCampaignsByUserId precisa ser implementado para consultar o DB para persistência
+      // Usa o método do storage em memória para buscar campanhas POR ID do usuário
       const campaigns = await storage.getCampaignsByUserId(userId);
       console.log("Campanhas encontradas:", campaigns);
 
       return res.json(campaigns);
     } catch (error) {
-      console.error("Erro na rota GET /api/campaigns/my:", error); // Adicionado log
+      console.error("Erro na rota GET /api/campaigns/my:", error);
       return res.status(500).json({ message: "Erro ao buscar suas campanhas" });
     }
   });
 
+  // GET /api/campaigns/code/:code: Busca campanha por código único
   app.get("/api/campaigns/code/:code", async (req: Request, res: Response) => {
     try {
       const code = req.params.code;
+      if (!code) {
+           return res.status(400).json({ message: "Código da campanha não fornecido" });
+      }
+      // Usa o método do storage em memória
       const campaign = await storage.getCampaignByCode(code);
 
       if (!campaign) {
@@ -98,17 +105,19 @@ export async function registerRoutes(app: Express): Promise<void> { // Corrigido
 
       return res.json(campaign);
     } catch (error) {
-      console.error("Erro na rota GET /api/campaigns/code/:code:", error); // Adicionado log
+      console.error("Erro na rota GET /api/campaigns/code/:code:", error);
       return res.status(500).json({ message: "Erro ao buscar campanha pelo código" });
     }
   });
 
+  // GET /api/campaigns/:id: Busca campanha por ID
   app.get("/api/campaigns/:id", async (req: Request, res: Response) => {
     try {
       const id = parseInt(req.params.id);
-      if (isNaN(id)) {
-         return res.status(400).json({ message: "ID da campanha inválido" }); // Validar se o ID é um número
-      }
+       if (isNaN(id)) {
+          return res.status(400).json({ message: "ID da campanha inválido" });
+       }
+      // Usa o método do storage em memória
       const campaign = await storage.getCampaign(id);
 
       if (!campaign) {
@@ -117,45 +126,38 @@ export async function registerRoutes(app: Express): Promise<void> { // Corrigido
 
       return res.json(campaign);
     } catch (error) {
-      console.error("Erro na rota GET /api/campaigns/:id:", error); // Adicionado log
+      console.error("Erro na rota GET /api/campaigns/:id:", error);
       return res.status(500).json({ message: "Erro ao buscar campanha" });
     }
   });
 
-  // Rota POST para criar campanha (com correção de data e uniqueCode/createdBy/JSON fields)
+
+  // POST /api/campaigns: Cria uma nova campanha (requer autenticação)
   app.post("/api/campaigns", requireAuth, async (req: Request, res: Response) => {
     try {
       // requireAuth garante que req.user está definido
       const user = req.user as User; // Asserção de tipo
 
-       // Extrai os dados relevantes do corpo da requisição
+       // Extrai os dados do corpo da requisição
       const {
-          title, // Esperado pelo frontend (payload.title)
-          description, // Esperado pelo frontend (payload.description)
-          location, // Esperado pelo frontend (payload.location)
-          startDate: startDateString, // String vinda do frontend (payload.startDate)
-          endDate: endDateString,     // String vinda do frontend (payload.endDate)
-          imageUrl, // String vinda do frontend (payload.imageUrl)
-          urgent = false, // Opcional, default false
-          active = true, // Opcional, default true
-          pickupSchedule, // Objeto vindo do frontend (payload.pickupSchedule)
-          districts // Array vindo do frontend (payload.districts)
+          title, description, location,
+          startDate: startDateString, endDate: endDateString, // Strings do input date
+          imageUrl, urgent = false, active = true,
+          pickupSchedule, districts // Objetos/Arrays do frontend
       } = req.body;
 
 
-      // --- CORREÇÃO: Converter strings de data para objetos Date ---
-      // startDate é opcional, pode ser null. endDate é obrigatório.
-      const parsedStartDate = startDateString ? new Date(startDateString) : null; // Converter string para Date ou null
-      const parsedEndDate = new Date(endDateString); // Converter string para Date
+      // --- CORREÇÃO: Converter strings de data para objetos Date antes da validação Zod ---
+      const parsedStartDate = startDateString ? new Date(startDateString) : null; // Converte para Date ou null
+      const parsedEndDate = new Date(endDateString); // Converte para Date (obrigatório)
 
-
-      // Verificar se as datas resultaram em objetos Date válidos (opcional, Zod também valida)
-      if (endDateString && isNaN(parsedEndDate.getTime())) {
-           return res.status(400).json({ message: "Data de término inválida" });
-      }
-       if (startDateString && parsedStartDate && isNaN(parsedStartDate.getTime())) {
-          return res.status(400).json({ message: "Data de início inválida" });
+      // Opcional: Verificar se as datas resultaram em objetos Date válidos
+       if (endDateString && isNaN(parsedEndDate.getTime())) {
+            return res.status(400).json({ message: "Data de término inválida" });
        }
+        if (startDateString && parsedStartDate && isNaN(parsedStartDate.getTime())) {
+           return res.status(400).json({ message: "Data de início inválida" });
+        }
 
 
       // Preparar os dados no formato esperado pelo insertCampaignSchema Zod
@@ -163,63 +165,63 @@ export async function registerRoutes(app: Express): Promise<void> { // Corrigido
           title: title,
           description: description,
           location: location,
-          startDate: parsedStartDate, // <-- Passando objeto Date ou null
-          endDate: parsedEndDate,     // <-- Passando objeto Date
-          imageUrl: imageUrl || null, // Assegurar que é string ou null
+          startDate: parsedStartDate, // <-- Passa objeto Date ou null
+          endDate: parsedEndDate,     // <-- Passa objeto Date
+          imageUrl: imageUrl || null, // Assegura que é string ou null
           active: active,
-          createdBy: user.id, // Atribui o ID do usuário logado
-          uniqueCode: Math.random().toString(36).substring(2, 8).toUpperCase(), // Gerar código único aqui no backend
+          createdBy: user.id, // Atribui o ID do usuário logado (número)
+          // uniqueCode: generateUniqueCode(), // Gerar código único aqui
           urgent: urgent,
-          // Mapear campos JSON - storage mock serializa, então passamos o objeto/array
+          // Campos JSON: storage em memória lida com objetos/arrays diretamente, mas é bom serializar/parsear na camada storage real
+          // Enviamos os objetos/arrays do frontend. O storage mock vai JSON.stringify.
           pickupSchedule: pickupSchedule || null,
           districts: districts || [],
       };
 
        console.log("Dados preparados para validação (POST /api/campaigns):", campaignDataForValidation);
 
-      // Validar os dados preparados com o insertCampaignSchema
-      // O schema espera 'Date' para startDate e endDate
+      // Validar os dados com o insertCampaignSchema (que espera Date para datas)
       const validatedData = insertCampaignSchema.parse(campaignDataForValidation);
 
        console.log("Dados validados pelo Zod:", validatedData);
 
-      // storage.createCampaign precisa ser implementado para persistência no DB
-      const campaign = await storage.createCampaign(validatedData); // Usar os dados validados
+      // Usa o método do storage em memória para criar campanha
+      // storage.createCampaign serializa/parseia JSON internamente no mock
+      const campaign = await storage.createCampaign(validatedData);
       console.log("Campanha criada no storage:", campaign);
 
       return res.status(201).json(campaign); // Retorna a campanha criada
 
     } catch (error) {
-      console.error("Erro na rota POST /api/campaigns:", error); // Adicionado log
+      console.error("Erro na rota POST /api/campaigns:", error);
       if (error instanceof z.ZodError) {
-        // Retornar erros de validação Zod formatados
         return res.status(400).json({ message: "Erro de validação", errors: error.errors });
       }
-      // Outros erros (storage, DB)
       return res.status(500).json({ message: "Erro ao criar campanha" });
     }
   });
 
-
-  app.put("/api/campaigns/:id", requireAuth, async (req: Request, res: Response) => {
+  // PUT /api/campaigns/:id: Atualiza uma campanha existente (requer autenticação)
+   app.put("/api/campaigns/:id", requireAuth, async (req: Request, res: Response) => {
     try {
       const id = parseInt(req.params.id);
       if (isNaN(id)) {
-         return res.status(400).json({ message: "ID da campanha inválido" }); // Validar ID
+         return res.status(400).json({ message: "ID da campanha inválido" });
       }
       // requireAuth garante que req.user está definido
       const user = req.user as User; // Asserção de tipo
 
-       // Opcional: verificar se o usuário logado é o criador da campanha ou admin
+       // Verificar se o usuário logado é o criador da campanha ou admin
        const campaign = await storage.getCampaign(id);
        if (!campaign) {
            return res.status(404).json({ message: "Campanha não encontrada" });
        }
+        // Verifica se o createdBy da campanha corresponde ao ID do usuário logado OU se o usuário é admin
         if (user.role !== 'admin' && campaign.createdBy !== user.id) {
              return res.status(403).json({ message: "Você não tem permissão para editar esta campanha" });
         }
 
-       // Extrair dados para atualização, incluindo a conversão de data se vierem
+       // Extrair dados para atualização do corpo da requisição
        const {
            title, description, location,
            startDate: startDateString, endDate: endDateString,
@@ -227,7 +229,7 @@ export async function registerRoutes(app: Express): Promise<void> { // Corrigido
            pickupSchedule, districts
        } = req.body;
 
-       // Preparar dados para atualização, convertendo datas se presentes
+       // Preparar dados para atualização, incluindo a conversão de data se vierem
        const updateData: Partial<Campaign> = {};
         if (title !== undefined) updateData.title = title;
         if (description !== undefined) updateData.description = description;
@@ -235,10 +237,11 @@ export async function registerRoutes(app: Express): Promise<void> { // Corrigido
         if (imageUrl !== undefined) updateData.imageUrl = imageUrl || null;
         if (urgent !== undefined) updateData.urgent = urgent;
         if (active !== undefined) updateData.active = active;
-        if (pickupSchedule !== undefined) updateData.pickupSchedule = pickupSchedule || null; // O storage mock vai serializar
-        if (districts !== undefined) updateData.districts = districts || []; // O storage mock vai serializar
+        // Campos JSON: Passar objeto/array, storage mock serializa/parseia
+        if (pickupSchedule !== undefined) updateData.pickupSchedule = pickupSchedule || null;
+        if (districts !== undefined) updateData.districts = districts || [];
 
-        // Converter datas SOMENTE se vierem na requisição de PUT
+        // Converter strings de data para objetos Date SOMENTE se vierem na requisição de PUT
         if (startDateString !== undefined) {
              const parsedStartDate = startDateString ? new Date(startDateString) : null;
              if (startDateString && parsedStartDate && isNaN(parsedStartDate.getTime())) {
@@ -246,7 +249,7 @@ export async function registerRoutes(app: Express): Promise<void> { // Corrigido
              }
              updateData.startDate = parsedStartDate; // Passa Date ou null
         }
-         if (endDateString !== undefined) { // endDate é obrigatório, mas pode ser enviado no PUT
+         if (endDateString !== undefined) { // endDate é obrigatório no schema, mas pode ser enviado no PUT
              const parsedEndDate = new Date(endDateString);
               if (endDateString && isNaN(parsedEndDate.getTime())) {
                  return res.status(400).json({ message: "Data de término inválida para atualização" });
@@ -254,32 +257,19 @@ export async function registerRoutes(app: Express): Promise<void> { // Corrigido
              updateData.endDate = parsedEndDate; // Passa Date
         }
 
-
-      // Opcional: Validar os dados de atualização com insertCampaignSchema.partial() se necessário
-      // try {
-      //    insertCampaignSchema.partial().parse(updateData);
-      // } catch (zodError) {
-      //    if (zodError instanceof z.ZodError) {
-      //        return res.status(400).json({ message: "Erro de validação na atualização", errors: zodError.errors });
-      //    }
-      //    throw zodError; // Lança outros erros de validação
-      // }
-
-
-      // storage.updateCampaign precisa ser implementado para persistência no DB
-      const updatedCampaign = await storage.updateCampaign(id, updateData); // Passar os dados preparados/validados
+      // storage.updateCampaign usa o método em memória
+      const updatedCampaign = await storage.updateCampaign(id, updateData);
 
       if (!updatedCampaign) {
-        // Se o updateCampaign retornar undefined mesmo com ID válido e dados, pode ser um erro no storage mock
-        return res.status(500).json({ message: "Erro interno ao atualizar campanha no armazenamento" }); // Mensagem mais clara
+        // Se o storage não encontrar/atualizar, retorna 404 (embora já tenhamos verificado antes)
+        return res.status(404).json({ message: "Campanha não encontrada após atualização" });
       }
-       // Buscar a campanha atualizada do storage para garantir que os dados de retorno estão corretos (especialmente campos JSON)
-       // No mock storage, updateCampaign já retorna o objeto atualizado, então não precisa buscar de novo.
-       // Em uma implementação DB, talvez fosse necessário buscar novamente.
 
+      // storage.updateCampaign em memória já retorna o objeto parseado
       return res.json(updatedCampaign);
+
     } catch (error) {
-      console.error("Erro na rota PUT /api/campaigns/:id:", error); // Adicionado log
+      console.error("Erro na rota PUT /api/campaigns/:id:", error);
        if (error instanceof z.ZodError) { // Lidar com erros de validação na atualização
          return res.status(400).json({ message: "Erro de validação", errors: error.errors });
        }
@@ -287,15 +277,16 @@ export async function registerRoutes(app: Express): Promise<void> { // Corrigido
     }
   });
 
+
+  // DELETE /api/campaigns/:id: Exclui uma campanha (requer autenticação)
   app.delete("/api/campaigns/:id", requireAuth, async (req: Request, res: Response) => {
     try {
       const id = parseInt(req.params.id);
       if (isNaN(id)) {
-         return res.status(400).json({ message: "ID da campanha inválido" }); // Validar ID
+         return res.status(400).json({ message: "ID da campanha inválido" });
       }
       // requireAuth garante que req.user está definido
       const user = req.user as User; // Asserção de tipo
-      const userId = user.id; // Acessa user.id de forma segura
 
       // Verificar se a campanha pertence ao usuário logado ou se é admin
       const campaign = await storage.getCampaign(id);
@@ -304,23 +295,23 @@ export async function registerRoutes(app: Express): Promise<void> { // Corrigido
         return res.status(404).json({ message: "Campanha não encontrada" });
       }
 
-      // Se o usuário não é admin e não é dono da campanha, não pode excluir
-      if (user.role !== 'admin' && campaign.createdBy !== userId) { // Acessa user.role e campaign.createdBy de forma segura
+      // Verifica se o createdBy da campanha corresponde ao ID do usuário logado OU se o usuário é admin
+      if (user.role !== 'admin' && campaign.createdBy !== user.id) {
         return res.status(403).json({ message: "Você não tem permissão para excluir esta campanha" });
       }
 
-      // storage.deleteCampaign precisa ser implementado para persistência no DB
+      // Usa o método do storage em memória para excluir campanha (e relacionados em memória)
       const deleted = await storage.deleteCampaign(id);
 
       if (!deleted) {
         // Este caso pode ocorrer se a campanha foi encontrada, mas a exclusão no storage falhou por algum motivo
-         console.error(`Falha na exclusão do storage para campanha ID ${id}.`); // Log mais específico
-        return res.status(500).json({ message: "Erro ao excluir campanha no armazenamento" }); // Status mais apropriado
+         console.error(`Falha na exclusão do storage em memória para campanha ID ${id}.`);
+        return res.status(500).json({ message: "Erro ao excluir campanha no armazenamento" });
       }
 
       return res.json({ message: "Campanha excluída com sucesso" });
     } catch (error) {
-      console.error("Erro na rota DELETE /api/campaigns/:id:", error); // Adicionado log
+      console.error("Erro na rota DELETE /api/campaigns/:id:", error);
       return res.status(500).json({ message: "Erro ao excluir campanha" });
     }
   });
@@ -331,8 +322,9 @@ export async function registerRoutes(app: Express): Promise<void> { // Corrigido
     try {
       const id = parseInt(req.params.id);
        if (isNaN(id)) {
-          return res.status(400).json({ message: "ID da campanha inválido" }); // Validar ID
+          return res.status(400).json({ message: "ID da campanha inválido" });
        }
+      // Usa o método do storage em memória
       const campaign = await storage.getCampaign(id);
 
       if (!campaign) {
@@ -340,14 +332,12 @@ export async function registerRoutes(app: Express): Promise<void> { // Corrigido
       }
 
       // Gerar URL com base no domínio da requisição e no código único da campanha
-      // Considerar ambiente de produção vs desenvolvimento
-      const host = req.headers.host; // Pega host do header
-      const protocol = req.protocol; // Pega protocolo da requisição
-      const baseUrl = `${protocol}://${host}`; // Construir URL base dinâmica
+      const host = req.headers.host;
+      const protocol = req.protocol;
+      const baseUrl = `${protocol}://${host}`;
       const campaignUrl = `${baseUrl}/doar/codigo/${campaign.uniqueCode}`;
 
       // Gerar QR Code como string base64
-      // qrcode.toDataURL pode lançar erro, envolver em try/catch
       try {
         const qrCodeDataUrl = await QRCode.toDataURL(campaignUrl);
          if (!qrCodeDataUrl) {
@@ -355,30 +345,29 @@ export async function registerRoutes(app: Express): Promise<void> { // Corrigido
          }
         return res.json({ qrCodeDataUrl, campaignUrl });
       } catch (qrError) {
-          console.error("Erro ao gerar QR Code Data URL:", qrError); // Log para erro na geração
+          console.error("Erro ao gerar QR Code Data URL:", qrError);
           return res.status(500).json({ message: "Erro ao gerar imagem do QR Code" });
       }
 
 
     } catch (error) {
-      console.error("Erro na rota GET /api/campaigns/:id/qrcode:", error); // Adicionado log
-      // Se o erro não for de campanha não encontrada (404 já tratado), é um erro do servidor
-      if (res.statusCode !== 404) { // Verifica se o status já foi definido para 404
+      console.error("Erro na rota GET /api/campaigns/:id/qrcode:", error);
+      // Se o erro não for 404 (já tratado), é 500
+      if (res.statusCode !== 404) {
          return res.status(500).json({ message: "Erro ao gerar QR Code" });
       }
-       // Se já definiu status 404, apenas retorna
-       return;
+       return; // Já enviou 404
     }
   });
 
   // Rotas de Categorias
   app.get("/api/categories", async (_req: Request, res: Response) => {
     try {
-      // storage.getCategories precisa ser implementado para persistência no DB
+      // Usa o método do storage em memória
       const categories = await storage.getCategories();
       return res.json(categories);
     } catch (error) {
-       console.error("Erro na rota GET /api/categories:", error); // Adicionado log
+       console.error("Erro na rota GET /api/categories:", error);
       return res.status(500).json({ message: "Erro ao buscar categorias" });
     }
   });
@@ -388,26 +377,27 @@ export async function registerRoutes(app: Express): Promise<void> { // Corrigido
     try {
       const campaignId = parseInt(req.params.campaignId);
        if (isNaN(campaignId)) {
-          return res.status(400).json({ message: "ID da campanha inválido" }); // Validar ID
+          return res.status(400).json({ message: "ID da campanha inválido" });
        }
-      // storage.getNeededItems precisa ser implementado para persistência no DB
+      // Usa o método do storage em memória
       const items = await storage.getNeededItems(campaignId);
       return res.json(items);
     } catch (error) {
-       console.error("Erro na rota GET /api/campaigns/:campaignId/items:", error); // Adicionado log
+       console.error("Erro na rota GET /api/campaigns/:campaignId/items:", error);
       return res.status(500).json({ message: "Erro ao buscar itens necessários" });
     }
   });
 
+  // POST /api/needed-items: Cria um novo item necessário (requer autenticação)
   app.post("/api/needed-items", requireAuth, async (req: Request, res: Response) => {
     try {
       // Valida a entrada com o esquema
       const data = insertNeededItemSchema.parse(req.body);
-      // storage.createNeededItem precisa ser implementado para persistência no DB
+      // Usa o método do storage em memória
       const neededItem = await storage.createNeededItem(data);
       return res.status(201).json(neededItem);
     } catch (error) {
-       console.error("Erro na rota POST /api/needed-items:", error); // Adicionado log
+       console.error("Erro na rota POST /api/needed-items:", error);
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Erro de validação", errors: error.errors });
       }
@@ -415,17 +405,17 @@ export async function registerRoutes(app: Express): Promise<void> { // Corrigido
     }
   });
 
+  // PUT /api/needed-items/:id: Atualiza item necessário (requer autenticação)
   app.put("/api/needed-items/:id", requireAuth, async (req: Request, res: Response) => {
     try {
       const id = parseInt(req.params.id);
        if (isNaN(id)) {
-          return res.status(400).json({ message: "ID do item inválido" }); // Validar ID
+          return res.status(400).json({ message: "ID do item inválido" });
        }
        // Opcional: verificar se o usuário logado tem permissão sobre este item (ex: é dono da campanha)
        // const item = await storage.getNeededItem(id);
        // if (!item) return res.status(404).json({ message: "Item não encontrado" });
        // const campaign = await storage.getCampaign(item.campaignId);
-       // if (!campaign) return res.status(404).json({ message: "Campanha do item não encontrada" });
        // const user = req.user as User;
        // if (user.role !== 'admin' && campaign.createdBy !== user.id) {
        //      return res.status(403).json({ message: "Você não tem permissão para editar este item" });
@@ -433,7 +423,7 @@ export async function registerRoutes(app: Express): Promise<void> { // Corrigido
 
       // Validar apenas os campos permitidos para atualização se necessário
       // try {
-      //     insertNeededItemSchema.partial().parse(req.body); // Exemplo: usar partial() para permitir campos opcionais
+      //     insertNeededItemSchema.partial().parse(req.body);
       // } catch (zodError) {
       //    if (zodError instanceof z.ZodError) {
       //        return res.status(400).json({ message: "Erro de validação na atualização do item", errors: zodError.errors });
@@ -442,8 +432,8 @@ export async function registerRoutes(app: Express): Promise<void> { // Corrigido
       // }
 
 
-      // storage.updateNeededItem precisa ser implementado para persistência no DB
-      const updatedItem = await storage.updateNeededItem(id, req.body); // Passar req.body diretamente ou dados validados
+      // Usa o método do storage em memória para atualizar
+      const updatedItem = await storage.updateNeededItem(id, req.body);
 
       if (!updatedItem) {
         return res.status(404).json({ message: "Item necessário não encontrado" });
@@ -451,16 +441,17 @@ export async function registerRoutes(app: Express): Promise<void> { // Corrigido
 
       return res.json(updatedItem);
     } catch (error) {
-       console.error("Erro na rota PUT /api/needed-items/:id:", error); // Adicionado log
+       console.error("Erro na rota PUT /api/needed-items/:id:", error);
       return res.status(500).json({ message: "Erro ao atualizar item necessário" });
     }
   });
 
+  // DELETE /api/needed-items/:id: Exclui item necessário (requer autenticação)
   app.delete("/api/needed-items/:id", requireAuth, async (req: Request, res: Response) => {
     try {
       const id = parseInt(req.params.id);
        if (isNaN(id)) {
-          return res.status(400).json({ message: "ID do item inválido" }); // Validar ID
+          return res.status(400).json({ message: "ID do item inválido" });
        }
       // Opcional: verificar se o usuário logado tem permissão sobre este item (como no PUT)
       // const item = await storage.getNeededItem(id);
@@ -471,31 +462,30 @@ export async function registerRoutes(app: Express): Promise<void> { // Corrigido
       //      return res.status(403).json({ message: "Você não tem permissão para excluir este item" });
       // }
 
-      // storage.deleteNeededItem precisa ser implementado para persistência no DB
+      // Usa o método do storage em memória para excluir (e remover itens de doação relacionados em memória)
       const deleted = await storage.deleteNeededItem(id);
 
       if (!deleted) {
-        // Pode ser 404 se o item não for encontrado mesmo após a verificação de permissão (corrida?)
-         console.error(`Falha na exclusão do storage para item ID ${id}.`); // Log mais específico
-        return res.status(404).json({ message: "Item não encontrado para exclusão" }); // Status mais apropriado
+         console.error(`Falha na exclusão do storage em memória para item ID ${id}.`);
+        return res.status(404).json({ message: "Item não encontrado para exclusão" });
       }
 
       return res.json({ message: "Item excluído com sucesso" });
     } catch (error) {
-      console.error("Erro na rota DELETE /api/needed-items/:id:", error); // Adicionado log
+      console.error("Erro na rota DELETE /api/needed-items/:id:", error);
       return res.status(500).json({ message: "Erro ao excluir item necessário" });
     }
   });
 
-  // Rotas de Doações Materiais (Itens)
+  // --- Rotas de Doações Materiais (Itens) ---
+
+  // POST /api/donations: Registra uma nova doação material (não requer autenticação por padrão)
   app.post("/api/donations", async (req: Request, res: Response) => {
     try {
       // Validar dados da doação principal com o schema correto
-      // donationProcessSchema inclui campos do doador E a lista de itens
       const validatedDonationData = donationProcessSchema.parse(req.body);
 
-      // Crie a doação principal primeiro
-      // storage.createDonation precisa ser implementado para persistência no DB
+      // Usa o método do storage em memória para criar a doação principal
       const donation = await storage.createDonation({
           campaignId: validatedDonationData.campaignId,
           donorName: validatedDonationData.donorName,
@@ -505,18 +495,18 @@ export async function registerRoutes(app: Express): Promise<void> { // Corrigido
           city: validatedDonationData.city,
           state: validatedDonationData.state,
           zipCode: validatedDonationData.zipCode,
-          pickupDate: validatedDonationData.pickupDate.toISOString().split('T')[0], // Converter Date para string YYYY-MM-DD para armazenamento (depende do storage)
+          // Armazenar data como string YYYY-MM-DD no storage mock (ou Date se storage suportar)
+          // Zod valida como Date, mas o mock storage armazena como string
+          pickupDate: validatedDonationData.pickupDate.toISOString().split('T')[0],
           pickupTime: validatedDonationData.pickupTime,
-          pickupInstructions: validatedDonationData.pickupInstructions || null, // Permitir instruções opcionais
+          pickupInstructions: validatedDonationData.pickupInstructions || null,
           status: "pending" // Status inicial
       });
 
       // Processar os itens da doação após a criação da doação principal
       if (validatedDonationData.items && Array.isArray(validatedDonationData.items)) {
         for (const item of validatedDonationData.items) {
-          // Validar cada item da lista se necessário (se tiver um schema para DonationItem)
-          // Aqui assumimos que a validação de item já está no schema donationProcessSchema
-          // storage.createDonationItem precisa ser implementado para persistência no DB
+          // Usa o método do storage em memória para criar itens de doação
           await storage.createDonationItem({
             donationId: donation.id, // Usa o ID da doação principal criada
             neededItemId: item.neededItemId,
@@ -525,32 +515,29 @@ export async function registerRoutes(app: Express): Promise<void> { // Corrigido
         }
       }
 
-      // Retornar a doação criada (pode incluir os itens se buscar após a criação)
-      // Para simplificar, retornamos a doação principal. O frontend pode buscar os itens separadamente se necessário.
+      // Retornar a doação criada (sem itens relacionados no objeto principal)
       return res.status(201).json(donation);
 
     } catch (error) {
-      console.error("Erro na rota POST /api/donations:", error); // Adicionado log
+      console.error("Erro na rota POST /api/donations:", error);
       if (error instanceof z.ZodError) {
-        // Retornar erros de validação Zod formatados
         return res.status(400).json({ message: "Erro de validação", errors: error.errors });
       }
-      // Outros erros (storage, DB)
       return res.status(500).json({ message: "Erro ao registrar doação" });
     }
   });
 
-
+  // GET /api/donations: Lista doações (opcionalmente filtradas por campanha) (requer autenticação)
   app.get("/api/donations", requireAuth, async (req: Request, res: Response) => {
     try {
       const campaignId = req.query.campaignId ? parseInt(req.query.campaignId as string) : undefined;
-      if (campaignId !== undefined && isNaN(campaignId)) { // Validar ID da campanha opcional
+      if (campaignId !== undefined && isNaN(campaignId)) {
          return res.status(400).json({ message: "ID da campanha inválido" });
       }
-      // storage.getDonations precisa ser implementado para persistência no DB
+      // Usa o método do storage em memória
       const donations = await storage.getDonations(campaignId);
 
-      // Para cada doação, buscar os itens (storage.getDonationItems precisa ser implementado para persistência no DB)
+      // Para cada doação, buscar os itens (storage.getDonationItems usa método em memória)
       const donationsWithItems = await Promise.all(
         donations.map(async (donation) => {
           const items = await storage.getDonationItems(donation.id);
@@ -560,59 +547,55 @@ export async function registerRoutes(app: Express): Promise<void> { // Corrigido
 
       return res.json(donationsWithItems);
     } catch (error) {
-       console.error("Erro na rota GET /api/donations:", error); // Adicionado log
+       console.error("Erro na rota GET /api/donations:", error);
       return res.status(500).json({ message: "Erro ao buscar doações" });
     }
   });
 
+  // GET /api/donations/:id: Busca doação por ID (requer autenticação)
   app.get("/api/donations/:id", requireAuth, async (req: Request, res: Response) => {
     try {
       const id = parseInt(req.params.id);
        if (isNaN(id)) {
-          return res.status(400).json({ message: "ID da doação inválido" }); // Validar ID
+          return res.status(400).json({ message: "ID da doação inválido" });
        }
-      // storage.getDonation precisa ser implementado para persistência no DB
+      // Usa o método do storage em memória
       const donation = await storage.getDonation(id);
 
       if (!donation) {
         return res.status(404).json({ message: "Doação não encontrada" });
       }
 
-      // Buscar os itens da doação (storage.getDonationItems precisa ser implementado para persistência no DB)
+      // Buscar os itens da doação (storage.getDonationItems usa método em memória)
       const items = await storage.getDonationItems(donation.id);
 
       return res.json({ ...donation, items });
     } catch (error) {
-      console.error("Erro na rota GET /api/donations/:id:", error); // Adicionado log
+      console.error("Erro na rota GET /api/donations/:id:", error);
       return res.status(500).json({ message: "Erro ao buscar doação" });
     }
   });
 
+  // PUT /api/donations/:id/status: Atualiza status da doação (requer autenticação)
   app.put("/api/donations/:id/status", requireAuth, async (req: Request, res: Response) => {
     try {
       const id = parseInt(req.params.id);
        if (isNaN(id)) {
-          return res.status(400).json({ message: "ID da doação inválido" }); // Validar ID
+          return res.status(400).json({ message: "ID da doação inválido" });
        }
       const { status } = req.body;
 
-      // Validar o status recebido (ex: usando Zod enum ou lista permitida)
-      const allowedStatuses = ["pending", "confirmed", "scheduled", "collected", "cancelled"];
+      // Validar o status recebido
+      const allowedStatuses = ["pending", "confirmed", "scheduled", "collected", "cancelled"]; // Ajuste os status permitidos conforme seu schema
       if (!status || typeof status !== 'string' || !allowedStatuses.includes(status)) {
         return res.status(400).json({ message: "Status inválido" });
       }
 
-      // Opcional: verificar se o usuário logado tem permissão para alterar o status (ex: admin ou dono da campanha)
-      // const donation = await storage.getDonation(id);
-      // if (!donation) return res.status(404).json({ message: "Doação não encontrada" });
-      // const campaign = await storage.getCampaign(donation.campaignId);
-      // const user = req.user as User;
-      // if (user.role !== 'admin' && campaign.createdBy !== user.id) {
-      //      return res.status(403).json({ message: "Você não tem permissão para alterar o status desta doação" });
-      // }
+      // Opcional: verificar permissão (admin ou dono da campanha)
+      // ... (lógica comentada) ...
 
 
-      // storage.updateDonationStatus precisa ser implementado para persistência no DB
+      // Usa o método do storage em memória para atualizar status
       const updatedDonation = await storage.updateDonationStatus(id, status);
 
       if (!updatedDonation) {
@@ -621,16 +604,14 @@ export async function registerRoutes(app: Express): Promise<void> { // Corrigido
 
       return res.json(updatedDonation);
     } catch (error) {
-       console.error("Erro na rota PUT /api/donations/:id/status:", error); // Adicionado log
+       console.error("Erro na rota PUT /api/donations/:id/status:", error);
       return res.status(500).json({ message: "Erro ao atualizar status da doação" });
     }
   });
 
-  // --- Rotas de Gerenciadores de Campanha (COMENTADAS - Implementação parcial/mock) ---
-  // Conforme discutido, estas rotas parecem ser uma implementação separada e não integrada
-  // com o sistema de autenticação e armazenamento principal.
-  // Para evitar erros e simplificar, elas foram comentadas.
-  // Se necessário, devem ser implementadas completamente usando o sistema de armazenamento Drizzle.
+  // --- Rotas de Gerenciadores de Campanha / Contas Bancárias (COMENTADAS - Mocks Incompletos) ---
+  // Conforme discutido, estas rotas são mocks e não parte do fluxo principal de autenticação.
+  // Elas permanecem comentadas.
 
   // app.post("/api/campaign-managers/register", async (req: Request, res: Response) => { /* ... */ });
   // app.post("/api/campaign-managers/login", async (req: Request, res: Response) => { /* ... */ });
@@ -638,13 +619,24 @@ export async function registerRoutes(app: Express): Promise<void> { // Corrigido
   // app.post("/api/campaigns", requireManager, async (req: Request, res: Response) => { /* ... */ });
 
 
-  // Rotas de Doações Financeiras
+  // --- Rotas de Doações Financeiras ---
+
+  // POST /api/financial-donations: Registra uma nova doação financeira (não requer autenticação por padrão)
   app.post("/api/financial-donations", async (req: Request, res: Response) => {
     try {
       // Validar e processar os dados da doação financeira com o schema correto
       const validatedData = financialDonationProcessSchema.parse(req.body);
 
-      // storage.createFinancialDonation precisa ser implementado para persistência no DB
+      // Informações da conta bancária para doação (FIXAS neste mock)
+      const accountInfoMock = {
+           banco: "Banco do Brasil",
+           agencia: "1234-5",
+           conta: "12345-6",
+           pix: "contato@sousolidario.org.br", // Chave PIX mockada
+           favorecido: "Associação Sou Solidário"
+       };
+
+      // Usa o método do storage em memória para criar doação financeira
       const financialDonation = await storage.createFinancialDonation({
         campaignId: validatedData.campaignId,
         donorName: validatedData.donorName,
@@ -652,28 +644,17 @@ export async function registerRoutes(app: Express): Promise<void> { // Corrigido
         donorPhone: validatedData.donorPhone,
         amount: validatedData.amount,
         paymentMethod: validatedData.paymentMethod,
-        // Informações da conta bancária para doação (FIXAS neste mock)
-        // Em um ambiente real, estas viriam da campanha associada
-         accountInfo: JSON.stringify({ // Stringify para armazenar como JSON no DB, se implementado
-             banco: "Banco do Brasil",
-             agencia: "1234-5",
-             conta: "12345-6",
-             pix: "contato@sousolidario.org.br", // Chave PIX mockada
-             favorecido: "Associação Sou Solidário"
-         }),
+        accountInfo: accountInfoMock, // Passa o objeto mockado
         message: validatedData.message,
         status: "pendente" // Status inicial
       });
 
-      // Retornar os dados da doação criada (incluindo info da conta mockada para o frontend)
-      return res.status(201).json({
-         ...financialDonation,
-         // TODO: Remover JSON.parse aqui se o storage mock já retornar o objeto parseado
-         accountInfo: financialDonation.accountInfo ? JSON.parse(financialDonation.accountInfo as string) : null
-      });
+      // storage.createFinancialDonation em memória serializa/parseia JSON internamente.
+      // Retornamos o objeto criado pelo storage (que já deve ter o accountInfo parseado)
+      return res.status(201).json(financialDonation);
 
     } catch (error) {
-      console.error("Erro na rota POST /api/financial-donations:", error); // Adicionado log
+      console.error("Erro na rota POST /api/financial-donations:", error);
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Erro de validação", errors: error.errors });
       }
@@ -681,93 +662,82 @@ export async function registerRoutes(app: Express): Promise<void> { // Corrigido
     }
   });
 
+  // GET /api/financial-donations: Lista doações financeiras (opcionalmente filtradas por campanha) (requer autenticação)
   app.get("/api/financial-donations", requireAuth, async (req: Request, res: Response) => {
     try {
       const campaignId = req.query.campaignId ? parseInt(req.query.campaignId as string) : undefined;
-      if (campaignId !== undefined && isNaN(campaignId)) { // Validar ID opcional
+      if (campaignId !== undefined && isNaN(campaignId)) {
          return res.status(400).json({ message: "ID da campanha inválido" });
       }
-      // storage.getFinancialDonations precisa ser implementado para persistência no DB
+      // Usa o método do storage em memória
       const donations = await storage.getFinancialDonations(campaignId);
 
-      // Opcional: Parse accountInfo de volta para objeto para cada doação no retorno
-      const donationsWithParsedInfo = donations.map(donation => ({
-          ...donation,
-          accountInfo: donation.accountInfo ? JSON.parse(donation.accountInfo as string) : null
-      }));
+      // storage.getFinancialDonations em memória já retorna com accountInfo parseado
 
-      return res.json(donationsWithParsedInfo);
+      return res.json(donations);
     } catch (error) {
-       console.error("Erro na rota GET /api/financial-donations:", error); // Adicionado log
+       console.error("Erro na rota GET /api/financial-donations:", error);
       return res.status(500).json({ message: "Erro ao buscar doações financeiras" });
     }
   });
 
+  // GET /api/financial-donations/:id: Busca doação financeira por ID (requer autenticação)
   app.get("/api/financial-donations/:id", requireAuth, async (req: Request, res: Response) => {
     try {
       const id = parseInt(req.params.id);
        if (isNaN(id)) {
-          return res.status(400).json({ message: "ID da doação financeira inválido" }); // Validar ID
+          return res.status(400).json({ message: "ID da doação financeira inválido" });
        }
-      // storage.getFinancialDonation precisa ser implementado para persistência no DB
+      // Usa o método do storage em memória
       const donation = await storage.getFinancialDonation(id);
 
       if (!donation) {
         return res.status(404).json({ message: "Doação financeira não encontrada" });
       }
 
-      // Opcional: Parse accountInfo de volta para objeto no retorno
-       const donationWithParsedInfo = {
-           ...donation,
-           accountInfo: donation.accountInfo ? JSON.parse(donation.accountInfo as string) : null
-       };
-
-      return res.json(donationWithParsedInfo);
+      // storage.getFinancialDonation em memória já retorna com accountInfo parseado
+      return res.json(donation);
     } catch (error) {
-      console.error("Erro na rota GET /api/financial-donations/:id:", error); // Adicionado log
+      console.error("Erro na rota GET /api/financial-donations/:id:", error);
       return res.status(500).json({ message: "Erro ao buscar doação financeira" });
     }
   });
 
+  // PUT /api/financial-donations/:id/status: Atualiza status da doação financeira (requer autenticação)
   app.put("/api/financial-donations/:id/status", requireAuth, async (req: Request, res: Response) => {
     try {
       const id = parseInt(req.params.id);
        if (isNaN(id)) {
-          return res.status(400).json({ message: "ID da doação financeira inválido" }); // Validar ID
+          return res.status(400).json({ message: "ID da doação financeira inválido" });
        }
       const { status } = req.body;
 
       // Validar o status recebido
-      const allowedStatuses = ["pendente", "confirmado", "cancelado"]; // Ajuste os status permitidos
+      const allowedStatuses = ["pendente", "confirmado", "cancelado"]; // Ajuste os status permitidos conforme seu schema
       if (!status || typeof status !== 'string' || !allowedStatuses.includes(status)) {
         return res.status(400).json({ message: "Status inválido" });
       }
 
       // Opcional: verificar permissão (admin ou dono da campanha)
-      // const donation = await storage.getFinancialDonation(id);
-      // if (!donation) return res.status(404).json({ message: "Doação financeira não encontrada" });
-      // const campaign = await storage.getCampaign(donation.campaignId);
-      // const user = req.user as User;
-      // if (user.role !== 'admin' && campaign.createdBy !== user.id) {
-      //      return res.status(403).json({ message: "Você não tem permissão para alterar o status desta doação financeira" });
-      // }
+      // ... (lógica comentada) ...
 
-      // storage.updateFinancialDonationStatus precisa ser implementado para persistência no DB
+      // Usa o método do storage em memória para atualizar status
       const updatedDonation = await storage.updateFinancialDonationStatus(id, status);
 
       if (!updatedDonation) {
         return res.status(404).json({ message: "Doação financeira não encontrada para atualização de status" });
       }
 
+      // storage.updateFinancialDonationStatus em memória já retorna com accountInfo parseado
       return res.json(updatedDonation);
     } catch (error) {
-       console.error("Erro na rota PUT /api/financial-donations/:id/status:", error); // Adicionado log
+       console.error("Erro na rota PUT /api/financial-donations/:id/status:", error);
       return res.status(500).json({ message: "Erro ao atualizar status da doação financeira" });
     }
   });
 
 
-  // API do Chatbot (simplificada)
+  // API do Chatbot (simplificada) - Não requer autenticação por padrão
   app.post("/api/chat", async (req: Request, res: Response) => {
     try {
       const { message, campaignId } = req.body;
@@ -778,10 +748,9 @@ export async function registerRoutes(app: Express): Promise<void> { // Corrigido
 
       let response = "Olá! Como posso ajudar você com sua doação hoje?";
 
-      // Lógica simples para respostas do chatbot
+      // Lógica simples para respostas do chatbot baseada em palavras-chave
       const messageLower = message.toLowerCase();
 
-      // Respostas baseadas em palavras-chave
       if (messageLower.includes("como doar") || messageLower.includes("fazer doação")) {
         response = "Para fazer uma doação de itens, selecione uma campanha, escolha os itens que deseja doar, informe seus dados e agende a coleta. É simples e rápido! Você também pode fazer uma doação financeira por PIX, transferência ou depósito bancário.";
       }
@@ -792,11 +761,10 @@ export async function registerRoutes(app: Express): Promise<void> { // Corrigido
         response = "Não é necessário levar suas doações a um ponto de coleta. Nós iremos até você! Basta informar seu endereço e agendar um horário que seja conveniente durante o processo de doação de itens.";
       }
       else if (messageLower.includes("horário") || messageLower.includes("quando") || messageLower.includes("agendar")) {
-         // Poderíamos buscar horários disponíveis da campanha aqui se estivesse no DB
         response = "Você pode agendar a coleta durante o fluxo de doação de itens. Geralmente, as coletas ocorrem em dias úteis, em horários comerciais. Os horários específicos dependem da campanha.";
       }
       else if (messageLower.includes("contato") || messageLower.includes("telefone") || messageLower.includes("email")) {
-        response = "Para mais informações, você pode entrar em contato conosco pelo e-mail contato@sousolidario.org.br"; // Telefone mockado removido para evitar confusão
+        response = "Para mais informações, você pode entrar em contato conosco pelo e-mail contato@sousolidario.org.br";
       }
       else if (messageLower.includes("agradecer") || messageLower.includes("obrigado")) {
         response = "Nós que agradecemos sua generosidade! Juntos podemos fazer a diferença na vida de muitas pessoas.";
@@ -811,10 +779,10 @@ export async function registerRoutes(app: Express): Promise<void> { // Corrigido
         try {
           const id = parseInt(campaignId);
            if (!isNaN(id)) { // Verifica se o ID é um número válido
-             const campaign = await storage.getCampaign(id);
+             const campaign = await storage.getCampaign(id); // Busca campanha no storage em memória
              // Somente busca itens e personaliza se a campanha for encontrada
              if (campaign) {
-                const items = await storage.getNeededItems(id); // Busca itens para a campanha encontrada
+                const items = await storage.getNeededItems(id); // Busca itens para a campanha encontrada no storage em memória
 
                 if (messageLower.includes("precisa") || messageLower.includes("itens") || messageLower.includes("necessário")) {
                    if (items && items.length > 0) {
@@ -838,12 +806,12 @@ export async function registerRoutes(app: Express): Promise<void> { // Corrigido
                         response = `A campanha "${campaign.title}" ainda não tem itens específicos listados como necessários.`;
                     }
                 } else if (messageLower.includes("sobre a campanha") || messageLower.includes("detalhes da campanha")) {
-                    response = `A campanha "${campaign.title}" está acontecendo em ${campaign.location}. ${campaign.description}. Ela está ativa até ${new Date(campaign.endDate).toLocaleDateString('pt-BR')}. Você pode ver mais detalhes na página da campanha.`;
+                    response = `A campanha "${campaign.title}" está acontecendo em ${campaign.location}. ${campaign.description}. Ela está ativa até ${campaign.endDate ? new Date(campaign.endDate).toLocaleDateString('pt-BR') : 'Data indefinida'}. Você pode ver mais detalhes na página da campanha.`; // Usar endDate parseada se vier assim do storage mock
                 }
                 // Adicionar outras respostas personalizadas com base na campanha
                 // ...
              } else {
-                // Campanha não encontrada para o ID fornecido
+                // Campanha não encontrada para o ID fornecido no storage
                  response = "Não encontrei detalhes para esta campanha específica. Como posso ajudar com outra coisa?";
              }
            } else {
@@ -851,7 +819,7 @@ export async function registerRoutes(app: Express): Promise<void> { // Corrigido
                  response = "ID da campanha inválido. Por favor, selecione uma campanha para perguntar sobre ela.";
            }
         } catch (error) {
-          // Ignorar erros na busca por detalhes da campanha e usar resposta padrão
+          // Ignorar erros na busca por detalhes da campanha no storage e usar resposta padrão
           console.error("Erro ao buscar detalhes da campanha para chatbot:", error);
           // response já está com a resposta padrão ou uma resposta baseada em palavra-chave geral
         }
