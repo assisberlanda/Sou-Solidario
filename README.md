@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="./attached_assets/Maos.png" width="100">
+</p>
+
 # 🤝 Sou Solidário
 
 Olá a todos! Meu nome é Assis Berlanda de Medeiros, estudante de Engenharia de Software na Unicesumar e motivado por um curso em Google Cloud e AI, busquei criar uma plataforma que fosse além da Responsabilidade Social e Acessibilidade Digital.
