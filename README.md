@@ -1,10 +1,10 @@
 # 🤝 Sou Solidário
 
-<!-- ![Logo do Projeto (Opcional)](/path/to/your/logo.png) --> <!-- Uncomment and replace with the path to your logo image --> 
+Olá a todos! Meu nome é Assis Berlanda de Medeiros, estudante de Engenharia de Software na Unicesumar e motivado por um curso em Google Cloud e AI, busquei criar uma plataforma que fosse além da Responsabilidade Social e Acessibilidade Digital.
 
 ## 🎯 Visão Geral
 
-O **Sou Solidário** é uma plataforma digital responsiva concebida durante um projeto pessoal em maio de 2024 e adaptado ao **Hackathon Unicesumar** com o objetivo de conectar doadores a campanhas humanitárias e Ações Sociais. O projeto foca em Tema 01: Responsabilidade Social e Acessibilidade Digital, propondo a utilização de tecnologias de Google Cloud Computing e Inteligência Artificial para promover inclusão digital, acessibilidade e capacitação para populações vulneráveis.
+O **Sou Solidário** é uma plataforma digital responsiva concebida durante um projeto pessoal em maio de 2024 e adaptado ao **Hackathon Unicesumar** como uma resposta prática e inovadora aos desafios sociais urgentes, após a tragédia da enchente no Rio Grande do Sul [veja aqui](https://www.cnnbrasil.com.br/nacional/sul/rs/alagamentos-destruicao-e-183-mortes-relembre-a-tragedia-das-chuvas-no-rs-que-marcou-2024/), que devastou a cidade e destruiu famílias. Com o objetivo de conectar doadores à Campanhas Humanitárias e Ações Sociais. O projeto foca no Tema 01: Responsabilidade Social e Acessibilidade Digital, propondo a utilização de tecnologias de Google Cloud Computing e Inteligência Artificial para promover inclusão digital, acessibilidade e capacitação para populações vulneráveis. 
 
 ## ✨ Funcionalidades
 
@@ -43,7 +43,7 @@ A plataforma Sou Solidário oferece diversas funcionalidades, abordando diferent
 -   **Framework:** React
 -   **Routing:** Wouter
 -   **State Management/Data Fetching:** TanStack Query
--   **UI Components:** Shadcn UI (built on Radix UI)
+-   **UI Components:** Shadcn UI (desenvolvido com Radix UI)
 -   **Styling:** Tailwind CSS (`tailwindcss-animate`, `@tailwindcss/typography`)
 -   **Animations:** Framer Motion
 -   **Date Handling:** date-fns, React Day Picker
@@ -55,20 +55,20 @@ A plataforma Sou Solidário oferece diversas funcionalidades, abordando diferent
 
 **Backend:**
 -   **Framework:** Express
--   **Authentication:** Passport.js (Local Strategy), `crypto` (for password hashing)
--   **Session Management:** express-session, memorystore (in-memory session store)
--   **Database (Planned/Configured):** PostgreSQL (implied by Drizzle config), Neon Database (@neondatabase/serverless)
+-   **Authentication:** Passport.js (Estratégia Local), `crypto` (para hash de senha)
+-   **Session Management:** express-session, memorystore (armazenamento de sessão na memória)
+-   **Database (Planned/Configured):** PostgreSQL (implícito na configuração do Drizzle), Neon Database (@neondatabase/serverless) # Não usado no Localhost
 -   **ORM (Planned/Configured):** Drizzle ORM (`drizzle-kit`, `drizzle-zod`)
 -   **Environment Variables:** dotenv
 -   **Utilities:** uuid, qrcode
--   **API Interaction (partial):** Supabase JS (used directly in some routes in `server/index.ts`)
--   **WebSockets (implied by dependency):** ws (likely for real-time features, though not explicitly shown in the provided server logic)
+-   **API Interaction (parcial):** Supabase JS (usado diretamente em algumas rotas em `server/index.ts`, para uso futuro)
+-   **WebSockets (implícito pela dependência):** ws (provavelmente para recursos em tempo real, embora não explicitamente mostrado na lógica do servidor fornecida)
 
-**Build & Development Tools:**
+**Ferramentas de construção e desenvolvimento:**
 -   TypeScript
 -   Vite (@vitejs/plugin-react, @replit/vite-plugin-shadcn-theme-json, @replit/vite-plugin-cartographer, @replit/vite-plugin-runtime-error-modal)
--   tsx (for running TypeScript files directly)
--   esbuild (for backend bundling)
+-   tsx (para executar arquivos TypeScript diretamente)
+-   esbuild (para empacotamento de backend)
 -   autoprefixer, postcss
 
 ## 📈 Impacto Social Esperado
@@ -166,7 +166,7 @@ Para configurar e rodar o frontend e backend do projeto Sou Solidário **localme
 
 **Limitações deste Modo de Execução:**
 
-*   **Dados Não Persistentes:** Todas as alterações e cadastros feitos na aplicação (novos usuários, campanhas, doações) serão perdidos ao parar e reiniciar o servidor.
+*   **Dados Não Persistentes:** Todas as alterações e cadastros feitos na aplicação (novos usuários, campanhas, doações) serão perdidos ao parar e reiniciar o servidor. 
 
 
 
