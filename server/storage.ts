@@ -168,10 +168,10 @@ async function initializeInMemoryData() {
          districts: [{date: "2024-07-20", district: "Centro"}, {date: "2024-07-21", district: "Zona Sul"}], // Exemplo de estrutura
        },
         {
-         title: "Reconstrução em Petrópolis",
-         description: "Apoio às famílias afetadas pelos deslizamentos em Petrópolis. Materiais de construção e itens básicos.",
+         title: "Curso de Internet para Idosos",
+         description: "Estamos com 30 vagas aberta para o Curso de Internet e Redes Sociais para a terceira idade, para toda comunidade de Petrópolis - Venha participar para essa acessibilidade digital que está mudando o mundo! .",
          location: "Rio de Janeiro",
-         endDate: new Date("2024-11-30"), // Usar objetos Date
+         endDate: new Date("2025-11-30"), // Usar objetos Date
          createdBy: adminUser.id, // Atribuir ao usuário admin
          urgent: false,
          imageUrl: "/assets/petropolis.jpeg",

@@ -25,7 +25,7 @@ const Footer = () => {
               <h3 className="text-lg font-heading font-bold text-[#ffb74d]">Sou Solidário</h3>
             </div>
             <p className="text-[#ffcc80] text-sm">
-              Plataforma que conecta doadores a pessoas necessitadas em situações de emergência e desastres naturais.
+              Plataforma que conecta doadores à pessoas que necessitam de Educação Solidária ou em situações de emergência.
             </p>
           </div>
 
