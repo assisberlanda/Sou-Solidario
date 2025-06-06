@@ -144,7 +144,7 @@ Para configurar e rodar o projeto Sou Solidário localmente, siga os passos abai
 *   Node.js (versão 18 ou superior é recomendada com base nos `engines` de algumas dependências) e npm (ou yarn/pnpm).
 *   Git (para clonar o repositório, se aplicável, embora você tenha um arquivo zip).
 
-O Projeto projeto Sou Solidário aqui, foi desenvolvido para ser configurado e rodar o frontend e backend **localmente para teste, utilizando armazenamento em memória (não persistente)**. Siga os passos abaixo. Este modo é ideal para testes rápidos e visualização do aplicativo sem a necessidade de configurar um banco de dados externo.
+O Projeto Sou Solidário aqui, foi desenvolvido para ser configurado e rodar o frontend e backend **localmente para teste, utilizando armazenamento em memória (não persistente)**. Siga os passos abaixo. Este modo é ideal para testes rápidos e visualização do aplicativo sem a necessidade de configurar um banco de dados externo.
 
 **Passo a Passo:**
 
