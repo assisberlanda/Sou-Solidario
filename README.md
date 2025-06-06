@@ -8,7 +8,28 @@ Olá a todos! Meu nome é Assis Berlanda de Medeiros, estudante de Engenharia de
 
 ## 🎯 Visão Geral
 
-O **Sou Solidário** é uma plataforma digital responsiva concebida durante um projeto pessoal em maio de 2024 e adaptado ao **Hackathon Unicesumar** como uma resposta prática e inovadora aos desafios sociais urgentes, após a tragédia da enchente no Rio Grande do Sul [veja aqui](https://www.cnnbrasil.com.br/nacional/sul/rs/alagamentos-destruicao-e-183-mortes-relembre-a-tragedia-das-chuvas-no-rs-que-marcou-2024/), que devastou a cidade e destruiu famílias. Com o objetivo de conectar doadores à Campanhas Humanitárias e Ações Sociais. O projeto foca no Tema 01: Responsabilidade Social e Acessibilidade Digital, propondo a utilização de tecnologias de Google Cloud Computing e Inteligência Artificial para promover inclusão digital, acessibilidade e capacitação para populações vulneráveis. 
+O **Sou Solidário** é uma plataforma digital responsiva concebida durante um projeto pessoal em maio de 2024 e adaptado ao **Hackathon Unicesumar** como uma resposta prática e inovadora aos desafios sociais urgentes, após a tragédia da enchente no Rio Grande do Sul [veja aqui](https://www.cnnbrasil.com.br/nacional/sul/rs/alagamentos-destruicao-e-183-mortes-relembre-a-tragedia-das-chuvas-no-rs-que-marcou-2024/), que devastou a cidade e destruiu famílias e de um desejo profundo de transformar a realidade de milhares de pessoas. Com o objetivo de conectar doadores à Campanhas Humanitárias e Ações Sociais. O projeto foca no Tema 01: Responsabilidade Social e Acessibilidade Digital, propondo a utilização de tecnologias de Google Cloud Computing e Inteligência Artificial para promover inclusão digital, acessibilidade e capacitação para populações vulneráveis. 
+
+## A Gênese de uma Ideia: Solidariedade em Tempos de Crise
+Em maio de 2024, o Brasil testemunhava uma das maiores tragédias de sua história recente: a devastadora enchente no Rio Grande do Sul. Cidades foram submersas, famílias perderam tudo, e a comoção nacional impulsionou uma onda de solidariedade. No entanto, a boa vontade muitas vezes se deparava com obstáculos práticos. Lembro-me que naquele dia passava um carro de som pelo meu condomínio pedindo doações. A intenção de ajudar era genuína, mas a minha rotina corrida naquele momento e a incerteza sobre o que doar ou como entregar as contribuições acabaram por dificultar a minha ação.
+
+Foi diante dessa realidade, percebi as barreiras comuns que impedem a concretização da ajuda às pessoas necessitadas – a falta de tempo, o esquecimento, a dificuldade em levar as doações aos pontos de coleta e etc. – Daí a ideia do Sou Solidário começou a germinar. O objetivo era claro: criar uma ponte direta e eficiente entre quem quer ajudar e quem precisa de ajuda.
+
+Sou Solidário: Conectando Corações e Ações
+Com o Sou Solidário, Nosso foco é conectar doadores a Campanhas Humanitárias e Ações Sociais, simplificando o processo de doação. E a solidariedade se torna acessível e eficiente. Por meio do aplicativo, será possível:
+
+- Conhecer as necessidades específicas das vítimas: Informaremos quais itens são mais urgentes, evitando doações inadequadas e garantindo que a ajuda chegue onde é mais necessária.
+- Agendar a coleta das doações em casa: Eliminamos a necessidade de deslocamento, otimizando o tempo do doador e tornando o processo mais conveniente.
+- Fazer doações em dinheiro de forma segura: Oferecemos uma opção prática e transparente para quem prefere contribuir financeiramente.
+- E através da Inclusão e acessibilidade Digital, dispor programas de aprendizado tecnológico para a Capacitação Tecnológica para Todos, através da Inclusão e Acessibilidade Digital, vamos dispor programas de aprendizado tecnológico para grupos que historicamente enfrentam barreiras de acesso e oportunidades.
+
+### Nosso foco é capacitar:
+
+- Idosos, que muitas vezes se sentem excluídos do universo digital e podem se beneficiar enormemente da conexão e dos serviços online.
+- Pessoas de baixa renda, oferecendo as ferramentas e o conhecimento necessários para o desenvolvimento pessoal e profissional em um mundo cada vez mais digitalizado.
+- Mulheres, promovendo sua autonomia e inserção em áreas tecnológicas, combatendo a disparidade de gênero no setor.
+- Pessoas socialmente excluídas em geral, combatendo a exclusão digital e abrindo portas para novas perspectivas de futuro para todos.
+Nosso compromisso é que todos tenham a oportunidade de aprender e prosperar na era digital.
 
 ## ✨ Funcionalidades
 
