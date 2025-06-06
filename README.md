@@ -4,7 +4,8 @@
 
 # 🤝 Sou Solidário
 
-Olá a todos! Meu nome é Assis Berlanda de Medeiros, estudante de Engenharia de Software na Unicesumar e motivado por um curso em Google Cloud e AI, busquei criar uma plataforma que fosse além da Responsabilidade Social e Acessibilidade Digital.
+Olá a todos! Meu nome é Assis Berlanda de Medeiros, estudante de Engenharia de Software na Unicesumar e motivado por um curso em Google Cloud e AI, busquei criar uma plataforma que fosse além da Responsabilidade Social e Acessibilidade Digital. 
+- O Sou Solidário não é apenas um projeto de hackathon; é uma solução escalável, com um propósito social forte e a tecnologia para fazer a diferença. Convidamos você a se juntar a nós nesta jornada para construir um futuro mais justo, conectado e solidário.
 
 ## 🎯 Visão Geral
 
